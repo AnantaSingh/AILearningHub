@@ -3,19 +3,32 @@
 
 {% block content %}
 <div class="container mt-4">
-    <!-- Search Form -->
+    <!-- API Search Form -->
     <div class="row justify-content-center mb-4">
         <div class="col-md-8">
+            <h4 class="mb-3">Search External Resources</h4>
             <form method="get" class="d-flex">
                 <input type="text" name="q" class="form-control form-control-lg me-2" 
                        placeholder="Search AI resources..." value="{{ query }}">
-                <button class="btn btn-primary btn-lg" type="submit">Search</button>
+                <button class="btn btn-primary" type="submit">Search</button>
             </form>
         </div>
     </div>
 
-    <!-- Results -->
-    {% if query %}
+    <!-- Local Database Search Form -->
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-8">
+            <h4 class="mb-3">Search Saved Resources</h4>
+            <form method="get" action="{% url 'search:local_search' %}" class="d-flex">
+                <input type="text" name="q" class="form-control form-control-lg me-2" 
+                       placeholder="Search saved resources..." value="{{ local_query }}">
+                <button class="btn btn-success" type="submit">DB Search</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Results Section -->
+    <div class="results-section">
         {% if resources %}
             <!-- GitHub Repositories -->
             <h3 class="mb-4">
@@ -42,17 +55,32 @@
                                 <div class="card-footer d-flex justify-content-between">
                                     <a href="{{ resource.url }}" class="btn btn-outline-primary btn-sm" 
                                        target="_blank">View</a>
-                                    <button class="btn bookmark-btn {% if resource.is_bookmarked %}btn-primary{% else %}btn-outline-primary{% endif %}"
-                                            data-url="{{ resource.url }}"
-                                            data-title="{{ resource.title }}"
-                                            data-description="{{ resource.description }}"
-                                            data-type="{{ resource.source }}"
-                                            data-source="{{ resource.source }}"
-                                            data-metadata='{"stars": "{{ resource.stars }}", "language": "{{ resource.language|default:'' }}"}'
-                                            onclick="toggleBookmark(this)">
-                                        <i class="fa{% if resource.is_bookmarked %}s{% else %}r{% endif %} fa-bookmark"></i>
-                                        {% if resource.is_bookmarked %}Bookmarked{% else %}Bookmark{% endif %}
-                                    </button>
+                                    <div>
+                                        <button class="btn bookmark-btn {% if resource.is_bookmarked %}btn-primary{% else %}btn-outline-primary{% endif %} me-2"
+                                                data-url="{{ resource.url }}"
+                                                data-title="{{ resource.title }}"
+                                                data-description="{{ resource.description }}"
+                                                data-type="{{ resource.source }}"
+                                                data-source="{{ resource.source }}"
+                                                data-metadata='{"stars": "{{ resource.stars }}", "language": "{{ resource.language|default:'' }}"}'
+                                                onclick="toggleBookmark(this)">
+                                            <i class="fa{% if resource.is_bookmarked %}s{% else %}r{% endif %} fa-bookmark"></i>
+                                            {% if resource.is_bookmarked %}Bookmarked{% else %}Bookmark{% endif %}
+                                        </button>
+                                        
+                                        {% if user.is_superuser %}
+                                        <button class="btn btn-sm save-to-db-btn {% if resource.is_saved_to_db %}btn-success{% else %}btn-outline-success{% endif %}"
+                                                data-url="{{ resource.url }}"
+                                                data-title="{{ resource.title }}"
+                                                data-description="{{ resource.description }}"
+                                                data-source="{{ resource.source }}"
+                                                data-metadata='{"stars": "{{ resource.stars }}", "language": "{{ resource.language|default:'' }}"}'
+                                                onclick="saveToDb(this)">
+                                            <i class="fas {% if resource.is_saved_to_db %}fa-check{% else %}fa-database{% endif %}"></i>
+                                            {% if resource.is_saved_to_db %}Saved to DB{% else %}Save to DB{% endif %}
+                                        </button>
+                                        {% endif %}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -85,17 +113,32 @@
                                 <div class="card-footer d-flex justify-content-between">
                                     <a href="{{ resource.url }}" class="btn btn-outline-success btn-sm" 
                                        target="_blank">View</a>
-                                    <button class="btn bookmark-btn {% if resource.is_bookmarked %}btn-primary{% else %}btn-outline-primary{% endif %}"
-                                            data-url="{{ resource.url }}"
-                                            data-title="{{ resource.title }}"
-                                            data-description="{{ resource.description }}"
-                                            data-type="{{ resource.source }}"
-                                            data-source="{{ resource.source }}"
-                                            data-metadata='{"authors": "{{ resource.authors|escapejs }}", "published": "{{ resource.published }}"}'
-                                            onclick="toggleBookmark(this)">
-                                        <i class="fa{% if resource.is_bookmarked %}s{% else %}r{% endif %} fa-bookmark"></i>
-                                        {% if resource.is_bookmarked %}Bookmarked{% else %}Bookmark{% endif %}
-                                    </button>
+                                    <div>
+                                        <button class="btn bookmark-btn {% if resource.is_bookmarked %}btn-primary{% else %}btn-outline-primary{% endif %} me-2"
+                                                data-url="{{ resource.url }}"
+                                                data-title="{{ resource.title }}"
+                                                data-description="{{ resource.description }}"
+                                                data-type="{{ resource.source }}"
+                                                data-source="{{ resource.source }}"
+                                                data-metadata='{"authors": "{{ resource.authors|escapejs }}", "published": "{{ resource.published }}"}'
+                                                onclick="toggleBookmark(this)">
+                                            <i class="fa{% if resource.is_bookmarked %}s{% else %}r{% endif %} fa-bookmark"></i>
+                                            {% if resource.is_bookmarked %}Bookmarked{% else %}Bookmark{% endif %}
+                                        </button>
+                                        
+                                        {% if user.is_superuser %}
+                                        <button class="btn btn-sm save-to-db-btn {% if resource.is_saved_to_db %}btn-success{% else %}btn-outline-success{% endif %}"
+                                                data-url="{{ resource.url }}"
+                                                data-title="{{ resource.title }}"
+                                                data-description="{{ resource.description }}"
+                                                data-source="{{ resource.source }}"
+                                                data-metadata='{"authors": "{{ resource.authors|escapejs }}", "published": "{{ resource.published }}"}'
+                                                onclick="saveToDb(this)">
+                                            <i class="fas {% if resource.is_saved_to_db %}fa-check{% else %}fa-database{% endif %}"></i>
+                                            {% if resource.is_saved_to_db %}Saved to DB{% else %}Save to DB{% endif %}
+                                        </button>
+                                        {% endif %}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -103,34 +146,30 @@
                 {% endfor %}
             </div>
         {% else %}
-            <div class="alert alert-info">
-                No results found for "{{ query }}". Try different keywords.
+            <div class="text-center mt-5">
+                <h3>Search for AI Resources</h3>
+                <p class="lead">Find GitHub repositories and research papers related to AI</p>
+                <div class="row justify-content-center mt-4">
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5><i class="fab fa-github"></i> GitHub Repositories</h5>
+                                <p>Discover AI projects, libraries, and tools</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5><i class="fas fa-scroll"></i> Research Papers</h5>
+                                <p>Access latest AI research from arXiv</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         {% endif %}
-    {% else %}
-        <div class="text-center mt-5">
-            <h3>Search for AI Resources</h3>
-            <p class="lead">Find GitHub repositories and research papers related to AI</p>
-            <div class="row justify-content-center mt-4">
-                <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5><i class="fab fa-github"></i> GitHub Repositories</h5>
-                            <p>Discover AI projects, libraries, and tools</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5><i class="fas fa-scroll"></i> Research Papers</h5>
-                            <p>Access latest AI research from arXiv</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    {% endif %}
+    </div>
 </div>
 {% endblock %}
 
@@ -140,5 +179,6 @@
 
 {% block extra_js %}
 <script src="{% static 'js/bookmark.js' %}"></script>
+<script src="{% static 'js/admin.js' %}"></script>
 {% csrf_token %}
 {% endblock %} 

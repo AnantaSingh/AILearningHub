@@ -12,50 +12,52 @@ import json
 @require_POST
 @login_required
 def toggle_bookmark(request):
-    if not request.user.is_authenticated:
-        return JsonResponse({'error': 'Authentication required'}, status=401)
     try:
         data = json.loads(request.body)
-        print("Received data for bookmark:", json.dumps(data, indent=2))  # Pretty print the data
-
+        
         # Check if bookmark exists
         bookmark = Bookmark.objects.filter(
             user=request.user,
             url=data['url']
         ).first()
-
-        if bookmark:
-            print(f"Deleting bookmark {bookmark.id}")
-            bookmark.delete()
-            return JsonResponse({'status': 'removed'})
-
-        # Create new bookmark with metadata
-        metadata = {
-            'stars': data.get('metadata', {}).get('stars', ''),
-            'language': data.get('metadata', {}).get('language', ''),
-            'authors': data.get('metadata', {}).get('authors', ''),
-            'published': data.get('metadata', {}).get('published', '')
-        }
         
-        bookmark = Bookmark.objects.create(
-            user=request.user,
-            url=data['url'],
-            title=data['title'],
-            description=data['description'],
-            resource_type=data['resource_type'],
-            source=data['source'],
-            metadata=metadata
-        )
-        print(f"Created bookmark {bookmark.id} with metadata:", json.dumps(metadata, indent=2))
-        return JsonResponse({'status': 'added'})
-
+        if bookmark:
+            if bookmark.is_admin_saved:
+                # If admin saved, just toggle bookmark flag
+                bookmark.is_bookmarked = not bookmark.is_bookmarked
+                bookmark.save()
+            else:
+                # If only bookmarked, delete it
+                bookmark.delete()
+            
+            # Return success even if some data was missing
+            return JsonResponse({'status': 'success', 'action': 'removed'})
+        else:
+            # Create new bookmark with default values if data missing
+            Bookmark.objects.create(
+                user=request.user,
+                url=data['url'],
+                title=data.get('title', ''),
+                description=data.get('description', ''),
+                resource_type=data.get('type', 'GITHUB'),
+                source=data.get('source', ''),
+                metadata=data.get('metadata', {}),
+                is_bookmarked=True,
+                is_admin_saved=False
+            )
+            return JsonResponse({'status': 'success', 'action': 'added'})
+            
     except Exception as e:
-        print(f"Error saving bookmark: {str(e)}")
-        return JsonResponse({'status': 'error', 'message': str(e)})
+        print(f"Error in toggle_bookmark: {str(e)}")
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
 @login_required
 def bookmark_list(request):
-    bookmarks = Bookmark.objects.filter(user=request.user).order_by('-created_at')
+    # Only show items that are actually bookmarked by user
+    bookmarks = Bookmark.objects.filter(
+        user=request.user,
+        is_bookmarked=True  # Add this condition
+    ).order_by('-created_at')
     print(f"Found {bookmarks.count()} bookmarks for user {request.user.username}")
     return render(request, 'bookmarks/list.html', {'bookmarks': bookmarks})
 

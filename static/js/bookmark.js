@@ -109,22 +109,29 @@ function removeBookmark(btn) {
         },
         body: JSON.stringify(data)
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
     .then(result => {
-        if (result.status === 'removed') {
-            // Remove the entire card
-            const card = btn.closest('.col-md-6');
-            card.remove();
-            
-            // If no bookmarks left, show empty state
-            const bookmarksList = document.querySelector('.row');
-            if (!bookmarksList.querySelector('.col-md-6')) {
-                bookmarksList.innerHTML = `
-                    <div class="col-12 text-center">
-                        <p class="lead">No bookmarks yet.</p>
-                        <a href="/" class="btn btn-primary">Search Resources</a>
-                    </div>
-                `;
+        if (result.status === 'success') {
+            // Remove the bookmark item from the DOM
+            const bookmarkItem = btn.closest('.bookmark-item');
+            if (bookmarkItem) {
+                bookmarkItem.remove();
+                
+                // Check if there are any bookmarks left
+                const bookmarksList = document.querySelector('.row');
+                if (!bookmarksList.querySelector('.bookmark-item')) {
+                    bookmarksList.innerHTML = `
+                        <div class="col-12 text-center">
+                            <p class="lead">No bookmarks yet.</p>
+                            <a href="/" class="btn btn-primary">Search Resources</a>
+                        </div>
+                    `;
+                }
             }
         }
     })

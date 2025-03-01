@@ -4,6 +4,11 @@ from github import Github
 from django.conf import settings
 import logging
 from django.core.cache import cache
+from django.views.decorators.http import require_POST
+from django.contrib.admin.views.decorators import staff_member_required
+import json
+from bookmarks.models import Bookmark
+from .models import SavedResource
 
 logger = logging.getLogger(__name__)
 
@@ -58,3 +63,42 @@ def trending_repos(request):
 
 def github_explorer_view(request):
     return render(request, 'github_explorer.html')
+
+@require_POST
+@staff_member_required
+def save_to_db(request):
+    try:
+        data = json.loads(request.body)
+        url = data['url']
+        
+        # Check if bookmark exists
+        bookmark = Bookmark.objects.filter(
+            url=url,
+            user=request.user
+        ).first()
+        
+        if bookmark:
+            # Toggle admin save flag
+            bookmark.is_admin_saved = not bookmark.is_admin_saved
+            bookmark.save()
+            return JsonResponse({
+                'status': 'success', 
+                'action': 'added' if bookmark.is_admin_saved else 'removed'
+            })
+        else:
+            # Create new admin saved bookmark
+            Bookmark.objects.create(
+                user=request.user,
+                url=url,
+                title=data['title'],
+                description=data['description'],
+                source=data['source'],
+                metadata=data['metadata'],
+                resource_type='GITHUB' if data['source'] == 'GitHub' else 'PAPER',
+                is_bookmarked=False,
+                is_admin_saved=True
+            )
+            return JsonResponse({'status': 'success', 'action': 'added'})
+            
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)

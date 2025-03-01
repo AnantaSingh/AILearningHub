@@ -28,4 +28,5 @@ urlpatterns = [
     path('bookmarks/', include('bookmarks.urls')),
     path('api/github/trending/', trending_repos, name='trending_repos'),
     path('github-explorer/', github_explorer_view, name='github_explorer'),
+    path('api/resources/', include('resources.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

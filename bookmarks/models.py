@@ -15,6 +15,8 @@ class Bookmark(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     source = models.CharField(max_length=50)  # 'GitHub' or 'arXiv'
     metadata = models.JSONField(default=dict)  # For stars, authors, etc.
+    is_bookmarked = models.BooleanField(default=True)  # For user bookmarks
+    is_admin_saved = models.BooleanField(default=False)  # For admin DB saves
 
     class Meta:
         unique_together = ('user', 'url')

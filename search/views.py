@@ -20,16 +20,24 @@ class ResourceSearchView(TemplateView):
             search_service = AIResourceSearchService()
             results = search_service.search_all(query)
             
-            # Check which results are already bookmarked
+            # Get all admin-saved URLs
+            admin_saved_urls = set(
+                Bookmark.objects.filter(is_admin_saved=True)
+                .values_list('url', flat=True)
+            )
+            
+            # Check bookmarks
             if self.request.user.is_authenticated:
                 bookmarked_urls = set(
-                    Bookmark.objects.filter(user=self.request.user)
-                    .values_list('url', flat=True)
+                    Bookmark.objects.filter(
+                        user=self.request.user,
+                        is_bookmarked=True
+                    ).values_list('url', flat=True)
                 )
-                print(f"Found {len(bookmarked_urls)} bookmarked URLs")  # Add debug print
                 
                 for result in results:
                     result['is_bookmarked'] = result['url'] in bookmarked_urls
+                    result['is_saved_to_db'] = result['url'] in admin_saved_urls
             
             context['resources'] = results
         else:
@@ -75,3 +83,45 @@ class ResourceSearchViewOld(ListView):
             'selected_type': self.request.GET.get('type', '')
         })
         return context
+
+def search_view(request):
+    query = request.GET.get('q', '')
+    local_query = request.GET.get('local_q', '')
+    
+    # Your existing API search code here
+    resources = []  # Your API results
+    
+    # Add local search if local_query exists
+    local_results = []
+    if local_query:
+        local_results = Bookmark.objects.filter(
+            Q(title__icontains=local_query) |
+            Q(description__icontains=local_query) |
+            Q(source__icontains=local_query)
+        ).distinct()
+
+    return render(request, 'search/search_results.html', {
+        'query': query,
+        'local_query': local_query,
+        'resources': resources,
+        'local_results': local_results,
+    })
+
+def local_search_view(request):
+    query = request.GET.get('q', '')
+    local_results = []
+    
+    if query:
+        # Only show items that are admin saved, regardless of bookmark status
+        local_results = Bookmark.objects.filter(
+            is_admin_saved=True  # Only check admin saved flag
+        ).filter(
+            Q(title__icontains=query) |
+            Q(description__icontains=query) |
+            Q(source__icontains=query)
+        ).distinct()
+
+    return render(request, 'search/local_search.html', {
+        'query': query,
+        'local_results': local_results,
+    })

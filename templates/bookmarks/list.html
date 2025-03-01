@@ -6,7 +6,7 @@
     <h2 class="mb-4">My Bookmarks</h2>
     <div class="row">
         {% for bookmark in bookmarks %}
-            <div class="col-md-6 mb-4">
+            <div class="col-md-6 mb-4 bookmark-item">
                 <div class="card h-100 {% if bookmark.source == 'GitHub' %}border-primary{% else %}border-success{% endif %}">
                     <div class="card-header {% if bookmark.source == 'GitHub' %}bg-primary{% else %}bg-success{% endif %} text-white">
                         {% if bookmark.source == 'GitHub' %}
@@ -34,10 +34,11 @@
                         <a href="{{ bookmark.url }}" 
                            class="btn {% if bookmark.source == 'GitHub' %}btn-outline-primary{% else %}btn-outline-success{% endif %} btn-sm"
                            target="_blank">View</a>
-                        <button class="btn btn-outline-danger btn-sm remove-bookmark"
+                        <button class="btn btn-danger btn-sm" 
+                                onclick="removeBookmark(this)"
                                 data-url="{{ bookmark.url }}"
-                                onclick="removeBookmark(this)">
-                            <i class="fas fa-bookmark"></i> Remove
+                                >
+                            <i class="fas fa-trash"></i> Remove
                         </button>
                     </div>
                 </div>

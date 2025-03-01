@@ -76,3 +76,17 @@ class Resource(models.Model):
                 f"{self.get_resource_type_display()} {self.get_difficulty_level_display()}"
             )
         super().save(*args, **kwargs)
+
+class SavedResource(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    url = models.URLField()
+    source = models.CharField(max_length=50)  # 'GitHub' or 'arXiv'
+    metadata = models.JSONField(default=dict)  # For stars, language, authors etc
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.title
