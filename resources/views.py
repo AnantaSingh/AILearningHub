@@ -9,6 +9,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 import json
 from bookmarks.models import Bookmark
 from .models import SavedResource
+from .services.search_service import AIResourceSearchService
 
 logger = logging.getLogger(__name__)
 
@@ -80,7 +81,17 @@ def save_to_db(request):
         if bookmark:
             # Toggle admin save flag
             bookmark.is_admin_saved = not bookmark.is_admin_saved
+            
+            # If removing from DB, also remove user bookmark
+            if not bookmark.is_admin_saved:
+                bookmark.is_bookmarked = False
+            
             bookmark.save()
+            
+            # If neither flag is True, delete the record
+            if not bookmark.is_admin_saved and not bookmark.is_bookmarked:
+                bookmark.delete()
+            
             return JsonResponse({
                 'status': 'success', 
                 'action': 'added' if bookmark.is_admin_saved else 'removed'
@@ -102,3 +113,27 @@ def save_to_db(request):
             
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+@staff_member_required
+def admin_portal(request):
+    query = request.GET.get('q', '')
+    results = []
+    
+    if query:
+        search_service = AIResourceSearchService()
+        results = search_service.search_all(query)
+        
+        # Get all admin-saved URLs
+        admin_saved_urls = set(
+            Bookmark.objects.filter(is_admin_saved=True)
+            .values_list('url', flat=True)
+        )
+        
+        # Add saved status to results
+        for result in results:
+            result['is_saved_to_db'] = result['url'] in admin_saved_urls
+
+    return render(request, 'admin/portal.html', {
+        'query': query,
+        'resources': results
+    })

@@ -1,0 +1,114 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Admin Portal</h2>
+
+    <!-- API Search Form -->
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-8">
+            <h4 class="mb-3">Search External Resources</h4>
+            <form method="get" class="d-flex">
+                <input type="text" name="q" class="form-control form-control-lg me-2" 
+                       placeholder="Search AI resources..." value="{{ query }}">
+                <button class="btn btn-primary" type="submit">Search</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Results Section -->
+    <div class="results-section">
+        {% if resources %}
+            <!-- GitHub Repositories -->
+            <h3 class="mb-4">
+                <i class="fab fa-github"></i> GitHub Repositories
+            </h3>
+            <div class="row mb-5">
+                {% for resource in resources %}
+                    {% if resource.source == 'GitHub' %}
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100 border-primary">
+                                <div class="card-header bg-primary text-white d-flex justify-content-between">
+                                    <i class="fab fa-github"></i>
+                                    <span>{{ resource.stars }} ⭐</span>
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ resource.title }}</h5>
+                                    <p class="card-text">{{ resource.description }}</p>
+                                    {% if resource.language %}
+                                        <span class="badge bg-secondary">{{ resource.language }}</span>
+                                    {% endif %}
+                                </div>
+                                <div class="card-footer d-flex justify-content-between">
+                                    <a href="{{ resource.url }}" class="btn btn-outline-primary btn-sm" target="_blank">View</a>
+                                    <button class="btn btn-sm save-to-db-btn {% if resource.is_saved_to_db %}btn-success{% else %}btn-outline-success{% endif %}"
+                                            data-url="{{ resource.url }}"
+                                            data-title="{{ resource.title }}"
+                                            data-description="{{ resource.description }}"
+                                            data-source="{{ resource.source }}"
+                                            data-metadata='{"stars": "{{ resource.stars }}", "language": "{{ resource.language|default:'' }}"}'
+                                            onclick="saveToDb(this)">
+                                        <i class="fas {% if resource.is_saved_to_db %}fa-check{% else %}fa-database{% endif %}"></i>
+                                        {% if resource.is_saved_to_db %}Saved to DB{% else %}Save to DB{% endif %}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            <!-- Research Papers -->
+            <h3 class="mb-4">
+                <i class="fas fa-scroll"></i> Research Papers
+            </h3>
+            <div class="row">
+                {% for resource in resources %}
+                    {% if resource.source == 'arXiv' %}
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100 border-success">
+                                <div class="card-header bg-success text-white">
+                                    <i class="fas fa-scroll"></i> arXiv Paper
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ resource.title }}</h5>
+                                    <p class="card-text">{{ resource.description }}</p>
+                                    <div class="mt-3">
+                                        <small class="text-muted">
+                                            <strong>Authors:</strong> {{ resource.authors }}<br>
+                                            <strong>Published:</strong> {{ resource.published }}
+                                        </small>
+                                    </div>
+                                </div>
+                                <div class="card-footer d-flex justify-content-between">
+                                    <a href="{{ resource.url }}" class="btn btn-outline-success btn-sm" target="_blank">View</a>
+                                    <button class="btn btn-sm save-to-db-btn {% if resource.is_saved_to_db %}btn-success{% else %}btn-outline-success{% endif %}"
+                                            data-url="{{ resource.url }}"
+                                            data-title="{{ resource.title }}"
+                                            data-description="{{ resource.description }}"
+                                            data-source="{{ resource.source }}"
+                                            data-metadata='{"authors": "{{ resource.authors|escapejs }}", "published": "{{ resource.published }}"}'
+                                            onclick="saveToDb(this)">
+                                        <i class="fas {% if resource.is_saved_to_db %}fa-check{% else %}fa-database{% endif %}"></i>
+                                        {% if resource.is_saved_to_db %}Saved to DB{% else %}Save to DB{% endif %}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% else %}
+            {% if query %}
+                <div class="alert alert-info">No results found for "{{ query }}"</div>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/admin.js' %}"></script>
+{% csrf_token %}
+{% endblock %} 
