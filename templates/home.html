@@ -1,1 +1,28 @@
- 
+{% extends 'base/base.html' %}
+
+{% block title %}Home - AI Learning Hub{% endblock %}
+
+{% block content %}
+<div class="jumbotron">
+    <h1 class="display-4">Welcome to AI Learning Hub</h1>
+    <p class="lead">Your centralized platform for AI tutorials, resources, and learning materials.</p>
+    <hr class="my-4">
+    <p>Explore our collection of AI tutorials, courses, research papers, and GitHub repositories.</p>
+    <a class="btn btn-primary btn-lg" href="#" role="button">Start Learning</a>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-4">
+        <h2>Tutorials</h2>
+        <p>Learn AI concepts with step-by-step tutorials.</p>
+    </div>
+    <div class="col-md-4">
+        <h2>Courses</h2>
+        <p>Structured learning paths for AI education.</p>
+    </div>
+    <div class="col-md-4">
+        <h2>Resources</h2>
+        <p>Curated AI learning materials and tools.</p>
+    </div>
+</div>
+{% endblock %} 
