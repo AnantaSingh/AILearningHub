@@ -15,15 +15,18 @@ class AIResourceSearchService:
                 sort='stars',
                 order='desc'
             )
-            for repo in repositories[:5]:  # Top 5 repos
-                yield {
-                    'title': repo.name,
-                    'description': repo.description or "No description available",
-                    'url': repo.html_url,
-                    'stars': repo.stargazers_count,
-                    'language': repo.language,
-                    'source': 'GitHub'
+            return [{
+                'title': repo.name,
+                'description': repo.description or "No description available",
+                'url': repo.html_url,
+                'stars': repo.stargazers_count,
+                'language': repo.language,
+                'source': 'GitHub',
+                'metadata': {
+                    'stars': str(repo.stargazers_count),
+                    'language': repo.language or ''
                 }
+            } for repo in repositories[:5]]
         except Exception as e:
             print(f"GitHub search error: {e}")
             return []
@@ -36,15 +39,18 @@ class AIResourceSearchService:
                 max_results=5,  # Top 5 papers
                 sort_by=arxiv.SortCriterion.Relevance
             )
-            for paper in search.results():
-                yield {
-                    'title': paper.title,
-                    'description': paper.summary[:300] + "...",  # Truncate long summaries
-                    'url': paper.pdf_url,
-                    'authors': ', '.join([str(author) for author in paper.authors[:3]]),  # First 3 authors
-                    'published': paper.published.strftime("%Y-%m-%d"),
-                    'source': 'arXiv'
+            return [{
+                'title': paper.title,
+                'description': paper.summary[:300] + "...",  # Truncate long summaries
+                'url': paper.pdf_url,
+                'authors': ', '.join([str(author) for author in paper.authors[:3]]),  # First 3 authors
+                'published': paper.published.strftime("%Y-%m-%d"),
+                'source': 'arXiv',
+                'metadata': {
+                    'authors': ', '.join([str(author) for author in paper.authors[:3]]),
+                    'published': paper.published.strftime("%Y-%m-%d")
                 }
+            } for paper in search.results()]
         except Exception as e:
             print(f"arXiv search error: {e}")
             return []

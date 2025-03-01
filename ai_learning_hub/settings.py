@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'crispy_bootstrap4',
     'allauth',
     'allauth.account',
+    'allauth.socialaccount',
     
     # Local apps
     'core',
@@ -95,8 +96,12 @@ WSGI_APPLICATION = 'ai_learning_hub.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'ai_learning_hub',
+        'USER': 'postgres',
+        'PASSWORD': 'admin123',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
@@ -150,6 +155,7 @@ LOGIN_REDIRECT_URL = '/'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
+ACCOUNT_EMAIL_VERIFICATION = 'none'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

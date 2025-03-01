@@ -39,11 +39,23 @@
                                         {% endif %}
                                     </div>
                                 </div>
-                                <div class="card-footer">
+                                <div class="card-footer d-flex justify-content-between">
                                     <a href="{{ resource.url }}" class="btn btn-outline-primary btn-sm" 
-                                       target="_blank" rel="noopener noreferrer">
-                                        View Repository
-                                    </a>
+                                       target="_blank">View</a>
+                                    <button class="btn bookmark-btn {% if resource.is_bookmarked %}btn-primary{% else %}btn-outline-primary{% endif %}"
+                                            data-url="{{ resource.url }}"
+                                            data-title="{{ resource.title }}"
+                                            data-description="{{ resource.description }}"
+                                            data-type="{{ resource.source }}"
+                                            data-source="{{ resource.source }}"
+                                            data-stars="{{ resource.stars|default:'' }}"
+                                            data-language="{{ resource.language|default:'' }}"
+                                            data-authors="{{ resource.authors|default:'' }}"
+                                            data-published="{{ resource.published|default:'' }}"
+                                            onclick="toggleBookmark(this)">
+                                        <i class="fa{% if resource.is_bookmarked %}s{% else %}r{% endif %} fa-bookmark"></i>
+                                        {% if resource.is_bookmarked %}Bookmarked{% else %}Bookmark{% endif %}
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -73,11 +85,23 @@
                                         </small>
                                     </div>
                                 </div>
-                                <div class="card-footer">
+                                <div class="card-footer d-flex justify-content-between">
                                     <a href="{{ resource.url }}" class="btn btn-outline-success btn-sm" 
-                                       target="_blank" rel="noopener noreferrer">
-                                        View Paper
-                                    </a>
+                                       target="_blank">View</a>
+                                    <button class="btn bookmark-btn {% if resource.is_bookmarked %}btn-primary{% else %}btn-outline-primary{% endif %}"
+                                            data-url="{{ resource.url }}"
+                                            data-title="{{ resource.title }}"
+                                            data-description="{{ resource.description }}"
+                                            data-type="{{ resource.source }}"
+                                            data-source="{{ resource.source }}"
+                                            data-stars="{{ resource.stars|default:'' }}"
+                                            data-language="{{ resource.language|default:'' }}"
+                                            data-authors="{{ resource.authors|default:'' }}"
+                                            data-published="{{ resource.published|default:'' }}"
+                                            onclick="toggleBookmark(this)">
+                                        <i class="fa{% if resource.is_bookmarked %}s{% else %}r{% endif %} fa-bookmark"></i>
+                                        {% if resource.is_bookmarked %}Bookmarked{% else %}Bookmark{% endif %}
+                                    </button>
                                 </div>
                             </div>
                         </div>

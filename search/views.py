@@ -5,6 +5,7 @@ from .services import ResourceSearchService
 from resources.models import Category, Resource
 from django.db.models import Q
 from resources.services.search_service import AIResourceSearchService
+from bookmarks.models import Bookmark
 
 # Create your views here.
 
@@ -18,6 +19,18 @@ class ResourceSearchView(TemplateView):
         if query:
             search_service = AIResourceSearchService()
             results = search_service.search_all(query)
+            
+            # Check which results are already bookmarked
+            if self.request.user.is_authenticated:
+                bookmarked_urls = set(
+                    Bookmark.objects.filter(user=self.request.user)
+                    .values_list('url', flat=True)
+                )
+                print(f"Found {len(bookmarked_urls)} bookmarked URLs")  # Add debug print
+                
+                for result in results:
+                    result['is_bookmarked'] = result['url'] in bookmarked_urls
+            
             context['resources'] = results
         else:
             context['resources'] = []

@@ -1,0 +1,62 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">My Bookmarks</h2>
+    <div class="row">
+        {% for bookmark in bookmarks %}
+            <div class="col-md-6 mb-4">
+                <div class="card h-100 border-{{ bookmark.source|lower }}">
+                    <div class="card-header bg-{{ bookmark.source|lower }} text-white">
+                        {% if bookmark.source == 'GitHub' %}
+                            <i class="fab fa-github"></i> GitHub Repository
+                            <span class="float-end">⭐ {{ bookmark.metadata.stars }}</span>
+                        {% else %}
+                            <i class="fas fa-scroll"></i> Research Paper
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ bookmark.title }}</h5>
+                        <p class="card-text">{{ bookmark.description }}</p>
+                        {% if bookmark.source == 'GitHub' %}
+                            {% if bookmark.metadata.language %}
+                                <span class="badge bg-secondary">{{ bookmark.metadata.language }}</span>
+                            {% endif %}
+                        {% else %}
+                            <small class="text-muted">
+                                <strong>Authors:</strong> {{ bookmark.metadata.authors }}<br>
+                                <strong>Published:</strong> {{ bookmark.metadata.published }}
+                            </small>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer d-flex justify-content-between align-items-center">
+                        <a href="{{ bookmark.url }}" class="btn btn-outline-{{ bookmark.source|lower }} btn-sm" 
+                           target="_blank">View</a>
+                        <button class="btn btn-outline-danger btn-sm"
+                                onclick='toggleBookmark(this, {
+                                    "url": "{{ bookmark.url|escapejs }}"
+                                })'>
+                            <i class="fas fa-bookmark"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12 text-center">
+                <p class="lead">No bookmarks yet.</p>
+                <a href="/" class="btn btn-primary">Search Resources</a>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/bookmark.js' %}"></script>
+{% csrf_token %}
+{% endblock %} 
