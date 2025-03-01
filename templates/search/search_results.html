@@ -48,10 +48,7 @@
                                             data-description="{{ resource.description }}"
                                             data-type="{{ resource.source }}"
                                             data-source="{{ resource.source }}"
-                                            data-stars="{{ resource.stars|default:'' }}"
-                                            data-language="{{ resource.language|default:'' }}"
-                                            data-authors="{{ resource.authors|default:'' }}"
-                                            data-published="{{ resource.published|default:'' }}"
+                                            data-metadata='{"stars": "{{ resource.stars }}", "language": "{{ resource.language|default:'' }}"}'
                                             onclick="toggleBookmark(this)">
                                         <i class="fa{% if resource.is_bookmarked %}s{% else %}r{% endif %} fa-bookmark"></i>
                                         {% if resource.is_bookmarked %}Bookmarked{% else %}Bookmark{% endif %}
@@ -94,10 +91,7 @@
                                             data-description="{{ resource.description }}"
                                             data-type="{{ resource.source }}"
                                             data-source="{{ resource.source }}"
-                                            data-stars="{{ resource.stars|default:'' }}"
-                                            data-language="{{ resource.language|default:'' }}"
-                                            data-authors="{{ resource.authors|default:'' }}"
-                                            data-published="{{ resource.published|default:'' }}"
+                                            data-metadata='{"authors": "{{ resource.authors|escapejs }}", "published": "{{ resource.published }}"}'
                                             onclick="toggleBookmark(this)">
                                         <i class="fa{% if resource.is_bookmarked %}s{% else %}r{% endif %} fa-bookmark"></i>
                                         {% if resource.is_bookmarked %}Bookmarked{% else %}Bookmark{% endif %}

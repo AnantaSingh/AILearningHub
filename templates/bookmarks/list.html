@@ -7,13 +7,13 @@
     <div class="row">
         {% for bookmark in bookmarks %}
             <div class="col-md-6 mb-4">
-                <div class="card h-100 border-{{ bookmark.source|lower }}">
-                    <div class="card-header bg-{{ bookmark.source|lower }} text-white">
+                <div class="card h-100 {% if bookmark.source == 'GitHub' %}border-primary{% else %}border-success{% endif %}">
+                    <div class="card-header {% if bookmark.source == 'GitHub' %}bg-primary{% else %}bg-success{% endif %} text-white">
                         {% if bookmark.source == 'GitHub' %}
                             <i class="fab fa-github"></i> GitHub Repository
                             <span class="float-end">⭐ {{ bookmark.metadata.stars }}</span>
                         {% else %}
-                            <i class="fas fa-scroll"></i> Research Paper
+                            <i class="fas fa-scroll"></i> arXiv Paper
                         {% endif %}
                     </div>
                     <div class="card-body">
@@ -30,14 +30,14 @@
                             </small>
                         {% endif %}
                     </div>
-                    <div class="card-footer d-flex justify-content-between align-items-center">
-                        <a href="{{ bookmark.url }}" class="btn btn-outline-{{ bookmark.source|lower }} btn-sm" 
+                    <div class="card-footer d-flex justify-content-between">
+                        <a href="{{ bookmark.url }}" 
+                           class="btn {% if bookmark.source == 'GitHub' %}btn-outline-primary{% else %}btn-outline-success{% endif %} btn-sm"
                            target="_blank">View</a>
-                        <button class="btn btn-outline-danger btn-sm"
-                                onclick='toggleBookmark(this, {
-                                    "url": "{{ bookmark.url|escapejs }}"
-                                })'>
-                            <i class="fas fa-bookmark"></i>
+                        <button class="btn btn-outline-danger btn-sm remove-bookmark"
+                                data-url="{{ bookmark.url }}"
+                                onclick="removeBookmark(this)">
+                            <i class="fas fa-bookmark"></i> Remove
                         </button>
                     </div>
                 </div>

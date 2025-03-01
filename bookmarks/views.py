@@ -12,9 +12,11 @@ import json
 @require_POST
 @login_required
 def toggle_bookmark(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Authentication required'}, status=401)
     try:
         data = json.loads(request.body)
-        print("Received data:", data)  # Debug print
+        print("Received data for bookmark:", json.dumps(data, indent=2))  # Pretty print the data
 
         # Check if bookmark exists
         bookmark = Bookmark.objects.filter(
@@ -23,24 +25,32 @@ def toggle_bookmark(request):
         ).first()
 
         if bookmark:
-            print(f"Deleting bookmark {bookmark.id}")  # Debug print
+            print(f"Deleting bookmark {bookmark.id}")
             bookmark.delete()
             return JsonResponse({'status': 'removed'})
 
-        # Create new bookmark
+        # Create new bookmark with metadata
+        metadata = {
+            'stars': data.get('metadata', {}).get('stars', ''),
+            'language': data.get('metadata', {}).get('language', ''),
+            'authors': data.get('metadata', {}).get('authors', ''),
+            'published': data.get('metadata', {}).get('published', '')
+        }
+        
         bookmark = Bookmark.objects.create(
             user=request.user,
             url=data['url'],
             title=data['title'],
             description=data['description'],
             resource_type=data['resource_type'],
-            source=data['source']
+            source=data['source'],
+            metadata=metadata
         )
-        print(f"Created bookmark {bookmark.id}")  # Debug print
+        print(f"Created bookmark {bookmark.id} with metadata:", json.dumps(metadata, indent=2))
         return JsonResponse({'status': 'added'})
 
     except Exception as e:
-        print(f"Error: {str(e)}")  # Debug print
+        print(f"Error saving bookmark: {str(e)}")
         return JsonResponse({'status': 'error', 'message': str(e)})
 
 @login_required

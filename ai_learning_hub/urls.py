@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from resources.views import trending_repos, github_explorer_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -25,4 +26,6 @@ urlpatterns = [
     path('search/', include('search.urls')),
     path('accounts/', include('allauth.urls')),
     path('bookmarks/', include('bookmarks.urls')),
+    path('api/github/trending/', trending_repos, name='trending_repos'),
+    path('github-explorer/', github_explorer_view, name='github_explorer'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
