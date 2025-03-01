@@ -18,14 +18,16 @@
     <!-- Results Section -->
     <div class="results-section">
         {% if query %}
-            {% if local_results %}
-                <!-- GitHub Results -->
-                <h3 class="mb-4">
-                    <i class="fab fa-github"></i> GitHub Repositories
-                </h3>
-                <div class="row mb-5">
-                    {% for resource in local_results %}
-                        {% if resource.source == 'GitHub' %}
+            {% if github_results or arxiv_results or other_results %}
+                <p class="lead mb-4">Found {{ total_count }} results for "{{ query }}"</p>
+
+                {% if github_results %}
+                    <!-- GitHub Results -->
+                    <h3 class="mb-4">
+                        <i class="fab fa-github"></i> GitHub Repositories ({{ github_results|length }})
+                    </h3>
+                    <div class="row mb-5">
+                        {% for resource in github_results %}
                             <div class="col-md-6 mb-4">
                                 <div class="card h-100 border-primary">
                                     <div class="card-header bg-primary text-white d-flex justify-content-between">
@@ -41,24 +43,35 @@
                                             <span class="badge bg-secondary">{{ resource.metadata.language }}</span>
                                         {% endif %}
                                     </div>
-                                    <div class="card-footer">
-                                        <a href="{{ resource.url }}" class="btn btn-outline-primary btn-sm" target="_blank">
-                                            <i class="fas fa-external-link-alt"></i> View Repository
-                                        </a>
+                                    <div class="card-footer d-flex justify-content-between">
+                                        <a href="{{ resource.url }}" class="btn btn-outline-primary btn-sm" target="_blank">View</a>
+                                        {% if user.is_authenticated %}
+                                        <button class="btn bookmark-btn {% if resource.is_bookmarked %}btn-primary{% else %}btn-outline-primary{% endif %} btn-sm"
+                                                data-url="{{ resource.url }}"
+                                                data-title="{{ resource.title }}"
+                                                data-description="{{ resource.description }}"
+                                                data-type="{{ resource.resource_type }}"
+                                                data-source="{{ resource.source }}"
+                                                data-metadata='{"stars": "{{ resource.metadata.stars }}", "language": "{{ resource.metadata.language|default:'' }}"}'
+                                                onclick="toggleBookmark(this)">
+                                            <i class="fa{% if resource.is_bookmarked %}s{% else %}r{% endif %} fa-bookmark"></i>
+                                            {% if resource.is_bookmarked %}Bookmarked{% else %}Bookmark{% endif %}
+                                        </button>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
-                        {% endif %}
-                    {% endfor %}
-                </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
 
-                <!-- Research Papers -->
-                <h3 class="mb-4">
-                    <i class="fas fa-scroll"></i> Research Papers
-                </h3>
-                <div class="row">
-                    {% for resource in local_results %}
-                        {% if resource.source == 'arXiv' %}
+                {% if arxiv_results %}
+                    <!-- Research Papers -->
+                    <h3 class="mb-4">
+                        <i class="fas fa-scroll"></i> Research Papers ({{ arxiv_results|length }})
+                    </h3>
+                    <div class="row mb-5">
+                        {% for resource in arxiv_results %}
                             <div class="col-md-6 mb-4">
                                 <div class="card h-100 border-success">
                                     <div class="card-header bg-success text-white">
@@ -73,16 +86,39 @@
                                             </div>
                                         {% endif %}
                                     </div>
-                                    <div class="card-footer">
-                                        <a href="{{ resource.url }}" class="btn btn-outline-success btn-sm" target="_blank">
-                                            <i class="fas fa-external-link-alt"></i> View Paper
-                                        </a>
+                                    <div class="card-footer d-flex justify-content-between">
+                                        <a href="{{ resource.url }}" class="btn btn-outline-success btn-sm" target="_blank">View</a>
+                                        {% if user.is_authenticated %}
+                                        <button class="btn bookmark-btn {% if resource.is_bookmarked %}btn-primary{% else %}btn-outline-primary{% endif %} btn-sm"
+                                                data-url="{{ resource.url }}"
+                                                data-title="{{ resource.title }}"
+                                                data-description="{{ resource.description }}"
+                                                data-type="{{ resource.resource_type }}"
+                                                data-source="{{ resource.source }}"
+                                                data-metadata='{"stars": "{{ resource.metadata.stars }}", "language": "{{ resource.metadata.language|default:'' }}"}'
+                                                onclick="toggleBookmark(this)">
+                                            <i class="fa{% if resource.is_bookmarked %}s{% else %}r{% endif %} fa-bookmark"></i>
+                                            {% if resource.is_bookmarked %}Bookmarked{% else %}Bookmark{% endif %}
+                                        </button>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
-                        {% endif %}
-                    {% endfor %}
-                </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% if other_results %}
+                    <!-- Other Resources -->
+                    <h3 class="mb-4">
+                        <i class="fas fa-link"></i> Other Resources ({{ other_results|length }})
+                    </h3>
+                    <div class="row">
+                        {% for resource in other_results %}
+                            <!-- Other result card -->
+                        {% endfor %}
+                    </div>
+                {% endif %}
             {% else %}
                 <div class="alert alert-info">
                     No saved resources found for "{{ query }}". Try different keywords.

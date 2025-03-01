@@ -112,16 +112,37 @@ def local_search_view(request):
     local_results = []
     
     if query:
-        # Only show items that are admin saved, regardless of bookmark status
+        # Get all admin saved items
         local_results = Bookmark.objects.filter(
-            is_admin_saved=True  # Only check admin saved flag
+            is_admin_saved=True
         ).filter(
             Q(title__icontains=query) |
             Q(description__icontains=query) |
             Q(source__icontains=query)
         ).distinct()
 
+        # If user is authenticated, check which results are bookmarked
+        if request.user.is_authenticated:
+            bookmarked_urls = set(
+                Bookmark.objects.filter(
+                    user=request.user,
+                    is_bookmarked=True
+                ).values_list('url', flat=True)
+            )
+            
+            # Add is_bookmarked flag to each result
+            for result in local_results:
+                result.is_bookmarked = result.url in bookmarked_urls
+
+    # Group results by source
+    github_results = [r for r in local_results if r.source == 'GitHub']
+    arxiv_results = [r for r in local_results if r.source == 'arXiv']
+    other_results = [r for r in local_results if r.source not in ['GitHub', 'arXiv']]
+
     return render(request, 'search/local_search.html', {
         'query': query,
-        'local_results': local_results,
+        'github_results': github_results,
+        'arxiv_results': arxiv_results,
+        'other_results': other_results,
+        'total_count': len(local_results)
     })

@@ -56,18 +56,6 @@
                                     <a href="{{ resource.url }}" class="btn btn-outline-primary btn-sm" 
                                        target="_blank">View</a>
                                     <div>
-                                        <button class="btn bookmark-btn {% if resource.is_bookmarked %}btn-primary{% else %}btn-outline-primary{% endif %} me-2"
-                                                data-url="{{ resource.url }}"
-                                                data-title="{{ resource.title }}"
-                                                data-description="{{ resource.description }}"
-                                                data-type="{{ resource.source }}"
-                                                data-source="{{ resource.source }}"
-                                                data-metadata='{"stars": "{{ resource.stars }}", "language": "{{ resource.language|default:'' }}"}'
-                                                onclick="toggleBookmark(this)">
-                                            <i class="fa{% if resource.is_bookmarked %}s{% else %}r{% endif %} fa-bookmark"></i>
-                                            {% if resource.is_bookmarked %}Bookmarked{% else %}Bookmark{% endif %}
-                                        </button>
-                                        
                                         {% if user.is_superuser %}
                                         <button class="btn btn-sm save-to-db-btn {% if resource.is_saved_to_db %}btn-success{% else %}btn-outline-success{% endif %}"
                                                 data-url="{{ resource.url }}"
@@ -114,18 +102,6 @@
                                     <a href="{{ resource.url }}" class="btn btn-outline-success btn-sm" 
                                        target="_blank">View</a>
                                     <div>
-                                        <button class="btn bookmark-btn {% if resource.is_bookmarked %}btn-primary{% else %}btn-outline-primary{% endif %} me-2"
-                                                data-url="{{ resource.url }}"
-                                                data-title="{{ resource.title }}"
-                                                data-description="{{ resource.description }}"
-                                                data-type="{{ resource.source }}"
-                                                data-source="{{ resource.source }}"
-                                                data-metadata='{"authors": "{{ resource.authors|escapejs }}", "published": "{{ resource.published }}"}'
-                                                onclick="toggleBookmark(this)">
-                                            <i class="fa{% if resource.is_bookmarked %}s{% else %}r{% endif %} fa-bookmark"></i>
-                                            {% if resource.is_bookmarked %}Bookmarked{% else %}Bookmark{% endif %}
-                                        </button>
-                                        
                                         {% if user.is_superuser %}
                                         <button class="btn btn-sm save-to-db-btn {% if resource.is_saved_to_db %}btn-success{% else %}btn-outline-success{% endif %}"
                                                 data-url="{{ resource.url }}"
