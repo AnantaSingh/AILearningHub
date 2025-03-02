@@ -4,51 +4,78 @@
 {% block content %}
 <div class="container mt-4">
     <h2 class="mb-4">My Bookmarks</h2>
+    
     <div class="row">
-        {% for bookmark in bookmarks %}
-            <div class="col-md-6 mb-4 bookmark-item">
-                <div class="card h-100 {% if bookmark.source == 'GitHub' %}border-primary{% else %}border-success{% endif %}">
-                    <div class="card-header {% if bookmark.source == 'GitHub' %}bg-primary{% else %}bg-success{% endif %} text-white">
-                        {% if bookmark.source == 'GitHub' %}
-                            <i class="fab fa-github"></i> GitHub Repository
-                            <span class="float-end">⭐ {{ bookmark.metadata.stars }}</span>
-                        {% else %}
-                            <i class="fas fa-scroll"></i> arXiv Paper
-                        {% endif %}
-                    </div>
-                    <div class="card-body">
-                        <h5 class="card-title">{{ bookmark.title }}</h5>
-                        <p class="card-text">{{ bookmark.description }}</p>
-                        {% if bookmark.source == 'GitHub' %}
-                            {% if bookmark.metadata.language %}
-                                <span class="badge bg-secondary">{{ bookmark.metadata.language }}</span>
+        {% if bookmarks %}
+            {% for bookmark in bookmarks %}
+                <div class="col-md-6 mb-4 bookmark-item">
+                    <div class="card h-100 
+                        {% if bookmark.source == 'GitHub' %}border-primary
+                        {% elif bookmark.source == 'Coursera' %}border-info
+                        {% else %}border-success{% endif %}">
+                        <div class="card-header 
+                            {% if bookmark.source == 'GitHub' %}bg-primary
+                            {% elif bookmark.source == 'Coursera' %}bg-info
+                            {% else %}bg-success{% endif %} text-white">
+                            {% if bookmark.source == 'GitHub' %}
+                                <i class="fab fa-github"></i> GitHub Repository
+                                {% if bookmark.metadata.stars %}
+                                    <span>{{ bookmark.metadata.stars }} ⭐</span>
+                                {% endif %}
+                            {% elif bookmark.source == 'Coursera' %}
+                                <i class="fas fa-graduation-cap"></i> Online Course
+                                {% if bookmark.metadata.specialization %}
+                                    <span class="badge bg-light text-dark float-end">Specialization</span>
+                                {% endif %}
+                            {% else %}
+                                <i class="fas fa-scroll"></i> {{ bookmark.source }}
                             {% endif %}
-                        {% else %}
-                            <small class="text-muted">
-                                <strong>Authors:</strong> {{ bookmark.metadata.authors }}<br>
-                                <strong>Published:</strong> {{ bookmark.metadata.published }}
-                            </small>
-                        {% endif %}
-                    </div>
-                    <div class="card-footer d-flex justify-content-between">
-                        <a href="{{ bookmark.url }}" 
-                           class="btn {% if bookmark.source == 'GitHub' %}btn-outline-primary{% else %}btn-outline-success{% endif %} btn-sm"
-                           target="_blank">View</a>
-                        <button class="btn btn-danger btn-sm" 
-                                onclick="removeBookmark(this)"
-                                data-url="{{ bookmark.url }}"
-                                >
-                            <i class="fas fa-trash"></i> Remove
-                        </button>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">{{ bookmark.title }}</h5>
+                            <p class="card-text">{{ bookmark.description }}</p>
+                            {% if bookmark.source == 'GitHub' %}
+                                {% if bookmark.metadata.language %}
+                                    <span class="badge bg-secondary">{{ bookmark.metadata.language }}</span>
+                                {% endif %}
+                            {% elif bookmark.source == 'Coursera' %}
+                                {% if bookmark.metadata.partner %}
+                                    <div class="mt-2">
+                                        <small class="text-muted">
+                                            <strong>Partner:</strong> {{ bookmark.metadata.partner }}
+                                        </small>
+                                    </div>
+                                {% endif %}
+                            {% else %}
+                                <div class="mt-2">
+                                    <small class="text-muted">
+                                        <strong>Authors:</strong> {{ bookmark.metadata.authors }}<br>
+                                        <strong>Published:</strong> {{ bookmark.metadata.published }}
+                                    </small>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="card-footer d-flex justify-content-between">
+                            <a href="{{ bookmark.url }}" 
+                               class="btn {% if bookmark.source == 'GitHub' %}btn-outline-primary
+                                        {% elif bookmark.source == 'Coursera' %}btn-outline-info
+                                        {% else %}btn-outline-success{% endif %} btn-sm"
+                               target="_blank">View</a>
+                            <button class="btn btn-danger btn-sm" 
+                                    onclick="removeBookmark(this)"
+                                    data-url="{{ bookmark.url }}">
+                                <i class="fas fa-trash"></i> Remove
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
-        {% empty %}
+            {% endfor %}
+        {% else %}
             <div class="col-12 text-center">
                 <p class="lead">No bookmarks yet.</p>
-                <a href="/" class="btn btn-primary">Search Resources</a>
+                <a href="{% url 'search:local_search' %}" class="btn btn-primary">Search Resources</a>
             </div>
-        {% endfor %}
+        {% endif %}
     </div>
 </div>
 {% endblock %}

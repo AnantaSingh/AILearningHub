@@ -3,9 +3,10 @@ from django.views.generic import ListView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .services import ResourceSearchService
 from resources.models import Category, Resource
-from django.db.models import Q
+from django.db.models import Q, Count
 from resources.services.search_service import AIResourceSearchService
 from bookmarks.models import Bookmark
+import json  # Add this at the top
 
 # Create your views here.
 
@@ -109,17 +110,26 @@ def search_view(request):
 
 def local_search_view(request):
     query = request.GET.get('q', '')
+    selected_category = request.GET.get('category', '')
     local_results = []
     
-    if query:
-        # Get all admin saved items
-        local_results = Bookmark.objects.filter(
-            is_admin_saved=True
-        ).filter(
-            Q(title__icontains=query) |
-            Q(description__icontains=query) |
-            Q(source__icontains=query)
-        ).distinct()
+    if query or selected_category:
+        # Base query
+        base_query = Bookmark.objects.filter(is_admin_saved=True)
+        
+        # Apply category filter if selected
+        if selected_category:
+            base_query = base_query.filter(source=selected_category)
+        
+        # Apply search filter if query exists
+        if query:
+            base_query = base_query.filter(
+                Q(title__icontains=query) |
+                Q(description__icontains=query) |
+                Q(source__icontains=query)
+            )
+        
+        local_results = base_query.distinct()
 
         # If user is authenticated, check which results are bookmarked
         if request.user.is_authenticated:
@@ -130,19 +140,53 @@ def local_search_view(request):
                 ).values_list('url', flat=True)
             )
             
-            # Add is_bookmarked flag to each result
             for result in local_results:
                 result.is_bookmarked = result.url in bookmarked_urls
+                # Ensure metadata is properly formatted for all resource types
+                if result.metadata:
+                    if result.source == 'Coursera':
+                        result.metadata_json = json.dumps({
+                            'platform': result.metadata.get('platform', ''),
+                            'partner': result.metadata.get('partner', ''),
+                            'specialization': result.metadata.get('specialization', ''),
+                            'image_url': result.metadata.get('image_url', '')
+                        })
+                    elif result.source in ['arXiv', 'PapersWithCode']:
+                        result.metadata_json = json.dumps({
+                            'authors': result.metadata.get('authors', ''),
+                            'published': result.metadata.get('published', ''),
+                            'github_url': result.metadata.get('github_url', '')
+                        })
+                    else:  # GitHub
+                        result.metadata_json = json.dumps({
+                            'stars': result.metadata.get('stars', ''),
+                            'language': result.metadata.get('language', '')
+                        })
 
-    # Group results by source
+    # Get category counts for the sidebar
+    category_counts = Bookmark.objects.filter(is_admin_saved=True).values('source').annotate(
+        count=Count('id')
+    ).order_by('source')
+
+    # Get specific counts
+    github_count = sum(c['count'] for c in category_counts if c['source'] == 'GitHub')
+    paper_count = sum(c['count'] for c in category_counts if c['source'] in ['arXiv', 'PapersWithCode'])
+    course_count = sum(c['count'] for c in category_counts if c['source'] == 'Coursera')
+
+    # Separate results by source
     github_results = [r for r in local_results if r.source == 'GitHub']
-    arxiv_results = [r for r in local_results if r.source == 'arXiv']
-    other_results = [r for r in local_results if r.source not in ['GitHub', 'arXiv']]
+    paper_results = [r for r in local_results if r.source in ['arXiv', 'PapersWithCode']]
+    course_results = [r for r in local_results if r.source == 'Coursera']
 
     return render(request, 'search/local_search.html', {
         'query': query,
+        'selected_category': selected_category,
         'github_results': github_results,
-        'arxiv_results': arxiv_results,
-        'other_results': other_results,
-        'total_count': len(local_results)
+        'paper_results': paper_results,
+        'course_results': course_results,
+        'total_count': len(local_results),
+        'github_count': github_count,
+        'paper_count': paper_count,
+        'course_count': course_count,
+        'category_counts': category_counts,
     })

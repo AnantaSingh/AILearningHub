@@ -117,11 +117,16 @@ def save_to_db(request):
 @staff_member_required
 def admin_portal(request):
     query = request.GET.get('q', '')
+    selected_source = request.GET.get('source', '')
     results = []
     
     if query:
         search_service = AIResourceSearchService()
         results = search_service.search_all(query)
+        
+        # Filter by source if selected
+        if selected_source:
+            results = [r for r in results if r['source'] == selected_source]
         
         # Get all admin-saved URLs
         admin_saved_urls = set(
@@ -133,7 +138,16 @@ def admin_portal(request):
         for result in results:
             result['is_saved_to_db'] = result['url'] in admin_saved_urls
 
+    # Count results by type
+    github_count = len([r for r in results if r['source'] == 'GitHub'])
+    papers_count = len([r for r in results if r['source'] in ['arXiv', 'PapersWithCode']])
+    courses_count = len([r for r in results if r['source'] == 'Coursera'])
+
     return render(request, 'admin/portal.html', {
         'query': query,
-        'resources': results
+        'resources': results,
+        'selected_source': selected_source,
+        'github_count': github_count,
+        'papers_count': papers_count,
+        'courses_count': courses_count,
     })

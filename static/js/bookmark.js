@@ -41,10 +41,17 @@ function toggleBookmark(btn) {
         url: btn.dataset.url,
         title: btn.dataset.title,
         description: btn.dataset.description,
-        resource_type: btn.dataset.type,
         source: btn.dataset.source,
         metadata: metadata
     };
+
+    console.log('Bookmark data being sent:', {
+        url: data.url,
+        title: data.title,
+        description: data.description,
+        source: data.source,
+        metadata: data.metadata
+    });
 
     console.log('Sending data:', data);
 

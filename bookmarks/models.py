@@ -2,10 +2,15 @@ from django.db import models
 from django.contrib.auth.models import User
 
 class Bookmark(models.Model):
-    RESOURCE_TYPES = (
+    RESOURCE_TYPES = [
         ('GITHUB', 'GitHub Repository'),
         ('PAPER', 'Research Paper'),
-    )
+        ('COURSE', 'Online Course'),
+        ('BLOG', 'Blog Post'),
+        ('COMMUNITY', 'Community Resource'),
+        ('DOCUMENTATION', 'Documentation'),
+        ('BOOK', 'Book'),
+    ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
