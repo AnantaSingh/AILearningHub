@@ -164,12 +164,12 @@ class ChatBot:
 
     def get_response(self, user_input):
         """Generate a response to user input with improved matching and context"""
-        # Check for greeting
-        greeting_response = self._greeting(user_input)
-        if greeting_response:
-            return greeting_response
-
         try:
+            # Check for greeting
+            greeting_response = self._greeting(user_input)
+            if greeting_response:
+                return greeting_response
+
             # Check cache first
             user_input_processed = user_input.lower().strip()
             cached_response = self._get_response_cached(user_input_processed)
@@ -191,13 +191,14 @@ class ChatBot:
                     second_response = ': '.join(self.sentences[top_indices[1]].split(': ')[1:])
                     response = f"{response} {second_response}"
                 
+                print(f"Generated response: {response}")
                 return response
             else:
                 return ("I'm not quite sure about that. Could you please rephrase your question "
                        "or ask specifically about AI, machine learning, deep learning, or NLP?")
                 
         except Exception as e:
-            print(f"Error generating response: {e}")
+            print(f"Error in get_response: {str(e)}")
             return ("I encountered an error while processing your question. "
                    "Please try asking in a different way.")
 

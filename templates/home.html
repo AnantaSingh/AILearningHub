@@ -17,9 +17,9 @@
                 </a>
             </div>
             <div class="col-md-4">
-                <a href="{% url 'github_explorer' %}" class="btn btn-success btn-lg btn-block mb-3">
+                <button id="github-explorer-btn" class="btn btn-success btn-lg btn-block mb-3">
                     <i class="fab fa-github"></i> GitHub Explorer
-                </a>
+                </button>
             </div>
         </div>
     </div>
@@ -68,5 +68,14 @@
     if (typeof loadTrendingRepos === 'undefined') {
         console.error('loadTrendingRepos is not defined!');
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const explorerBtn = document.getElementById('github-explorer-btn');
+        if (explorerBtn) {
+            explorerBtn.addEventListener('click', function() {
+                loadTrendingRepos();
+            });
+        }
+    });
 </script>
 {% endblock %} 

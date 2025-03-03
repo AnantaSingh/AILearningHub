@@ -56,7 +56,7 @@ INSTALLED_APPS = [
     'resources',
     'search',
     'bookmarks',
-    'chatBot',
+    'chatbot.apps.ChatbotConfig',
 ]
 
 MIDDLEWARE = [

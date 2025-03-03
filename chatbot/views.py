@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_http_methods, require_POST
 from django.views.decorators.cache import cache_page
 import json
 from .chatbot import ChatBot
@@ -14,37 +14,31 @@ def chat_page(request):
     """Render the chat interface"""
     return render(request, 'chatBot/chat.html')
 
-@csrf_exempt
-@require_http_methods(["POST"])
+@require_POST
 def chat_api(request):
     """Handle chat API requests"""
     try:
         data = json.loads(request.body)
-        user_message = data.get('message', '').strip()
+        message = data.get('message', '')
         
-        if not user_message:
+        if not message:
             return JsonResponse({
-                'error': 'Message is required',
-                'success': False
+                'success': False,
+                'error': 'Message is required'
             }, status=400)
         
-        # Get response from chatbot
-        response = chatbot.get_response(user_message)
+        response = chatbot.get_response(message)
         
         return JsonResponse({
-            'response': response,
-            'success': True
+            'success': True,
+            'response': response
         })
-    except json.JSONDecodeError:
-        return JsonResponse({
-            'error': 'Invalid JSON format',
-            'success': False
-        }, status=400)
     except Exception as e:
+        print(f"Chatbot error: {str(e)}")  # Add logging
         return JsonResponse({
-            'error': f'An error occurred: {str(e)}',
-            'success': False
-        }, status=500)
+            'success': False,
+            'error': str(e)
+        }, status=400)
 
 from django.shortcuts import render
 

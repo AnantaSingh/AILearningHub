@@ -51,10 +51,13 @@ window.loadTrendingRepos = function() {
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM loaded, setting up GitHub Explorer...");
     const explorerBtn = document.getElementById('github-explorer-btn');
-    if (explorerBtn) {
-        console.log("Explorer button found, adding click listener");
-        explorerBtn.addEventListener('click', loadTrendingRepos);
+    const trendingSection = document.getElementById('github-trending');
+    
+    // Only initialize if we're on a page with the trending section
+    if (trendingSection) {
+        console.log("Trending section found, loading repos...");
+        loadTrendingRepos();
     } else {
-        console.error("Explorer button not found!");
+        console.log("Not on GitHub Explorer page");
     }
 }); 

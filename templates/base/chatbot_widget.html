@@ -299,7 +299,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const typingIndicator = addTypingIndicator();
 
         try {
-            const response = await fetch('/chatBot/api/chat/', {
+            const response = await fetch('/chatbot/api/chat/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -313,8 +313,12 @@ document.addEventListener('DOMContentLoaded', function() {
             // Remove typing indicator
             typingIndicator.remove();
 
-            if (response.ok && data.success) {
-                addMessage(data.response, 'bot');
+            if (response.ok) {
+                if (data.success) {
+                    addMessage(data.response, 'bot');
+                } else {
+                    addErrorMessage(data.error || 'Sorry, I encountered an error. Please try again.');
+                }
             } else {
                 addErrorMessage(data.error || 'Sorry, I encountered an error. Please try again.');
             }

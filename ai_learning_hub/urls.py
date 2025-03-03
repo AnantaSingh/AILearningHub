@@ -30,6 +30,5 @@ urlpatterns = [
     path('github-explorer/', github_explorer_view, name='github_explorer'),
     path('api/resources/', include('resources.urls')),
     path('admin-portal/', admin_portal, name='admin_portal'),
-    path("admin/", admin.site.urls),
-    path("chatBot/", include('chatBot.urls')),
+    path('chatbot/', include('chatbot.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
