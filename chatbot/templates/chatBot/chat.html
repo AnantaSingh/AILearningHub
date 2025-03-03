@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Learning Hub - Chatbot</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .chat-container {
+            height: calc(100vh - 180px);
+        }
+        .message-container {
+            max-height: calc(100vh - 250px);
+        }
+        .bot-message {
+            background-color: #f3f4f6;
+            border-radius: 15px 15px 15px 0;
+        }
+        .user-message {
+            background-color: #3b82f6;
+            color: white;
+            border-radius: 15px 15px 0 15px;
+        }
+        .typing-indicator span {
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+        .error-message {
+            background-color: #fee2e2;
+            color: #dc2626;
+            border-radius: 15px;
+            padding: 0.5rem 1rem;
+            margin: 0.5rem 0;
+            font-size: 0.875rem;
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .suggestions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+        .suggestion-chip {
+            background-color: #e5e7eb;
+            padding: 0.5rem 1rem;
+            border-radius: 999px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .suggestion-chip:hover {
+            background-color: #d1d5db;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
+            <!-- Chat Header -->
+            <div class="bg-blue-600 text-white p-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 rounded-full bg-white text-blue-600 flex items-center justify-center">
+                            <i class="fas fa-robot text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h1 class="text-xl font-semibold">AI Learning Assistant</h1>
+                            <p class="text-sm text-blue-100">Ask me anything about AI, ML, Deep Learning, and NLP</p>
+                        </div>
+                    </div>
+                    <button id="clear-chat" class="text-blue-100 hover:text-white transition-colors">
+                        <i class="fas fa-trash-alt"></i>
+                        <span class="ml-2">Clear Chat</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Chat Messages -->
+            <div class="chat-container p-4">
+                <div id="message-container" class="message-container overflow-y-auto space-y-4">
+                    <!-- Welcome message -->
+                    <div class="flex items-start space-x-2 fade-in">
+                        <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center">
+                            <i class="fas fa-robot text-white text-sm"></i>
+                        </div>
+                        <div class="flex flex-col space-y-4">
+                            <div class="bot-message p-3 max-w-[80%]">
+                                <p>Hi! I'm your AI Learning Assistant. I can help you learn about AI, ML, and related topics. How can I assist you today?</p>
+                            </div>
+                            <div class="suggestions">
+                                <div class="suggestion-chip" data-message="What is artificial intelligence?">What is AI?</div>
+                                <div class="suggestion-chip" data-message="Explain machine learning">Machine Learning</div>
+                                <div class="suggestion-chip" data-message="What is deep learning?">Deep Learning</div>
+                                <div class="suggestion-chip" data-message="Tell me about NLP">NLP</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Typing Indicator -->
+                <div id="typing-indicator" class="flex items-start space-x-2 mt-4 hidden fade-in">
+                    <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center">
+                        <i class="fas fa-robot text-white text-sm"></i>
+                    </div>
+                    <div class="bot-message p-3">
+                        <div class="typing-indicator space-x-1">
+                            <span>•</span>
+                            <span>•</span>
+                            <span>•</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Input -->
+            <div class="border-t p-4 bg-gray-50">
+                <form id="chat-form" class="flex space-x-4">
+                    <input 
+                        type="text" 
+                        id="user-input"
+                        class="flex-1 p-2 border rounded-lg focus:outline-none focus:border-blue-500"
+                        placeholder="Type your message here..."
+                        required
+                        autocomplete="off"
+                    >
+                    <button 
+                        type="submit"
+                        class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                        id="send-button"
+                    >
+                        <span>Send</span>
+                        <i class="fas fa-paper-plane ml-2"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('chat-form');
+            const input = document.getElementById('user-input');
+            const sendButton = document.getElementById('send-button');
+            const messageContainer = document.getElementById('message-container');
+            const typingIndicator = document.getElementById('typing-indicator');
+            const clearChatButton = document.getElementById('clear-chat');
+
+            // Handle suggestion chips
+            document.querySelectorAll('.suggestion-chip').forEach(chip => {
+                chip.addEventListener('click', () => {
+                    const message = chip.dataset.message;
+                    input.value = message;
+                    form.dispatchEvent(new Event('submit'));
+                });
+            });
+
+            // Clear chat
+            clearChatButton.addEventListener('click', () => {
+                if (confirm('Are you sure you want to clear the chat history?')) {
+                    const welcomeMessage = messageContainer.firstElementChild;
+                    messageContainer.innerHTML = '';
+                    messageContainer.appendChild(welcomeMessage);
+                }
+            });
+
+            let isProcessing = false;
+
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                if (isProcessing) return;
+                
+                const message = input.value.trim();
+                if (!message) return;
+
+                // Disable input and button while processing
+                isProcessing = true;
+                input.disabled = true;
+                sendButton.disabled = true;
+
+                // Add user message
+                addMessage(message, 'user');
+                input.value = '';
+
+                // Show typing indicator
+                typingIndicator.classList.remove('hidden');
+                messageContainer.scrollTop = messageContainer.scrollHeight;
+
+                try {
+                    const response = await fetch('/chatBot/api/chat/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ message: message })
+                    });
+
+                    const data = await response.json();
+                    
+                    // Hide typing indicator
+                    typingIndicator.classList.add('hidden');
+
+                    if (response.ok && data.success) {
+                        // Add bot response
+                        addMessage(data.response, 'bot');
+                    } else {
+                        // Add error message
+                        const errorMessage = data.error || 'Sorry, I encountered an error. Please try again.';
+                        addErrorMessage(errorMessage);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    typingIndicator.classList.add('hidden');
+                    addErrorMessage('Network error. Please check your connection and try again.');
+                } finally {
+                    // Re-enable input and button
+                    isProcessing = false;
+                    input.disabled = false;
+                    sendButton.disabled = false;
+                    input.focus();
+                }
+            });
+
+            function addMessage(message, sender) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'flex items-start space-x-2 fade-in';
+                
+                if (sender === 'bot') {
+                    messageDiv.innerHTML = `
+                        <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center">
+                            <i class="fas fa-robot text-white text-sm"></i>
+                        </div>
+                        <div class="flex flex-col space-y-4">
+                            <div class="bot-message p-3 max-w-[80%]">
+                                <p>${message}</p>
+                            </div>
+                            <div class="suggestions">
+                                <div class="suggestion-chip" data-message="Tell me more about ${getTopicFromMessage(message)}">Tell me more</div>
+                                <div class="suggestion-chip" data-message="What are the applications of ${getTopicFromMessage(message)}">Applications</div>
+                                <div class="suggestion-chip" data-message="Give examples of ${getTopicFromMessage(message)}">Examples</div>
+                            </div>
+                        </div>
+                    `;
+
+                    // Add click handlers for the new suggestion chips
+                    messageDiv.querySelectorAll('.suggestion-chip').forEach(chip => {
+                        chip.addEventListener('click', () => {
+                            input.value = chip.dataset.message;
+                            form.dispatchEvent(new Event('submit'));
+                        });
+                    });
+                } else {
+                    messageDiv.innerHTML = `
+                        <div class="ml-auto flex items-start space-x-2">
+                            <div class="user-message p-3 max-w-[80%]">
+                                <p>${message}</p>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                messageContainer.appendChild(messageDiv);
+                messageContainer.scrollTop = messageContainer.scrollHeight;
+            }
+
+            function addErrorMessage(message) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error-message fade-in';
+                errorDiv.innerHTML = `<i class="fas fa-exclamation-circle mr-2"></i>${message}`;
+                messageContainer.appendChild(errorDiv);
+                messageContainer.scrollTop = messageContainer.scrollHeight;
+            }
+
+            function getTopicFromMessage(message) {
+                const topics = ['artificial intelligence', 'machine learning', 'deep learning', 'nlp', 'neural networks'];
+                const messageLower = message.toLowerCase();
+                
+                for (const topic of topics) {
+                    if (messageLower.includes(topic)) {
+                        return topic;
+                    }
+                }
+                return 'this topic';
+            }
+
+            // Handle Enter key
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    form.dispatchEvent(new Event('submit'));
+                }
+            });
+        });
+    </script>
+</body>
+</html> 
