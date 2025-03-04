@@ -1,81 +1,257 @@
 {% extends 'base/base.html' %}
 {% load static %}
 
-{% block title %}Home - AI Learning Hub{% endblock %}
-
-{% block content %}
-<div class="container mt-4">
-    <!-- Hero Section -->
-    <div class="jumbotron text-center mb-5">
-        <h1 class="display-4">AI Learning Hub</h1>
-        <p class="lead">Discover AI resources, research papers, and GitHub projects</p>
-        <hr class="my-4">
-        <div class="row justify-content-center">
-            <div class="col-md-4">
-                <a href="{% url 'search:search' %}" class="btn btn-primary btn-lg btn-block mb-3">
-                    <i class="fas fa-search"></i> Search Resources
-                </a>
-            </div>
-            <div class="col-md-4">
-                <button id="github-explorer-btn" class="btn btn-success btn-lg btn-block mb-3">
-                    <i class="fab fa-github"></i> GitHub Explorer
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- GitHub Trending Section -->
-    <div id="github-trending" class="mt-4" style="display: none;">
-        <h2 class="mb-4"><i class="fab fa-github"></i> Trending AI Projects</h2>
-        <div class="row" id="trending-repos">
-            <!-- Repos will be loaded here -->
-        </div>
-    </div>
-</div>
-{% endblock %}
+{% block title %}AIHub - AI Learning Platform{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 <style>
-.input-group {
-    background: #f8f9fa;
-    border-radius: 50px;
-    overflow: hidden;
-}
+    :root {
+        --primary-color: #3b82f6;
+        --text-color: #1f2937;
+        --light-bg: #f3f4f6;
+        --white: #ffffff;
+    }
 
-.input-group input {
-    background: transparent;
-}
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        color: var(--text-color);
+        line-height: 1.6;
+    }
 
-.input-group .btn {
-    border-radius: 0 50px 50px 0;
-}
+    .hero-section {
+        background: var(--primary-color);
+        color: var(--white);
+        padding: 60px 0;
+        text-align: center;
+    }
 
-.card {
-    transition: transform 0.2s;
-}
+    .hero-content {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
 
-.card:hover {
-    transform: translateY(-5px);
-}
+    .hero-title {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+    }
+
+    .search-container {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 1rem;
+        font-size: 1rem;
+        border: none;
+        border-radius: 4px;
+    }
+
+    .search-button {
+        background: var(--text-color);
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-top: 1rem;
+    }
+
+    .grid-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        padding: 3rem 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .grid-item {
+        background: var(--white);
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 2rem;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .grid-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+
+    .grid-item h3 {
+        font-size: 1.3rem;
+        margin-bottom: 1rem;
+        color: var(--text-color);
+    }
+
+    .grid-item p {
+        color: #666;
+        margin-bottom: 1.5rem;
+    }
+
+    .grid-item .icon {
+        font-size: 1.5rem;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+    }
+
+    .grid-item .action-link {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    footer {
+        background: var(--text-color);
+        color: var(--white);
+        padding: 2rem 0;
+        text-align: center;
+        margin-top: 4rem;
+    }
+
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2rem;
+        }
+
+        .grid-container {
+            grid-template-columns: 1fr;
+            padding: 2rem 1rem;
+        }
+    }
+
+    .auth-buttons {
+        margin-top: 2rem;
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    .auth-button {
+        padding: 0.75rem 1.5rem;
+        border-radius: 4px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: background-color 0.2s;
+    }
+
+    .login-button {
+        background-color: var(--white);
+        color: var(--primary-color);
+    }
+
+    .login-button:hover {
+        background-color: #f3f4f6;
+    }
+
+    .signup-button {
+        background-color: var(--text-color);
+        color: var(--white);
+    }
+
+    .signup-button:hover {
+        background-color: #111827;
+    }
 </style>
 {% endblock %}
 
-{% block extra_js %}
-<script src="{% static 'js/github-explorer.js' %}"></script>
-<script>
-    console.log('Home page loaded');
-    if (typeof loadTrendingRepos === 'undefined') {
-        console.error('loadTrendingRepos is not defined!');
-    }
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="hero-content">
+        <h1 class="hero-title">AIHub</h1>
+        <p class="hero-subtitle">Unlock the World of AI Learning</p>
+        <div class="search-container">
+            <form action="{% url 'search:search' %}" method="get">
+                {% csrf_token %}
+                <input type="text" name="q" class="search-input" placeholder="Search AI tutorials, research papers, GitHub repositories...">
+                <button type="submit" class="search-button">Search</button>
+            </form>
+        </div>
+        <div class="auth-buttons">
+            {% if user.is_authenticated %}
+                <a href="{% url 'logout' %}" class="auth-button login-button">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="auth-button login-button">Login</a>
+                <a href="{% url 'signup' %}" class="auth-button signup-button">Sign Up</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
 
-    document.addEventListener('DOMContentLoaded', function() {
-        const explorerBtn = document.getElementById('github-explorer-btn');
-        if (explorerBtn) {
-            explorerBtn.addEventListener('click', function() {
-                loadTrendingRepos();
-            });
-        }
-    });
-</script>
+<!-- Grid Section -->
+<div class="grid-container">
+    <!-- Open Source Projects -->
+    <div class="grid-item">
+        <div class="icon">
+            <i class="fab fa-github"></i>
+        </div>
+        <h3>Open Source Projects</h3>
+        <p>Discover and explore open-source AI projects. Learn from real-world implementations and contribute to the community.</p>
+        <a href="{% url 'github_explorer' %}" class="action-link">Explore Projects →</a>
+    </div>
+
+    <!-- GitHub Repositories -->
+    <div class="grid-item">
+        <div class="icon">
+            <i class="fas fa-code-branch"></i>
+        </div>
+        <h3>GitHub Repositories</h3>
+        <p>Browse and search through curated GitHub repositories. Find the best AI tools, libraries, and frameworks.</p>
+        <a href="{% url 'github_explorer' %}" class="action-link">Browse Repos →</a>
+    </div>
+
+    <!-- Research Papers -->
+    <div class="grid-item">
+        <div class="icon">
+            <i class="fas fa-file-alt"></i>
+        </div>
+        <h3>Research Papers</h3>
+        <p>Explore the latest AI research papers and academic publications. Stay updated with cutting-edge developments.</p>
+        <a href="{% url 'search:search' %}?type=paper" class="action-link">Read Papers →</a>
+    </div>
+
+    <!-- Personal Bookmarks -->
+    <div class="grid-item">
+        <div class="icon">
+            <i class="fas fa-bookmark"></i>
+        </div>
+        <h3>Personal Bookmarks</h3>
+        <p>Save your favorite resources and create your personal learning library. Access your bookmarks anytime.</p>
+        <a href="{% url 'bookmarks:list' %}" class="action-link">View Bookmarks →</a>
+    </div>
+
+    <!-- AI Resources -->
+    <div class="grid-item">
+        <div class="icon">
+            <i class="fas fa-brain"></i>
+        </div>
+        <h3>AI Resources</h3>
+        <p>Access a curated collection of AI learning resources, tutorials, and guides.</p>
+        <a href="{% url 'search:local_search' %}" class="action-link">Browse Resources →</a>
+    </div>
+
+    <!-- Community -->
+    <div class="grid-item">
+        <div class="icon">
+            <i class="fas fa-users"></i>
+        </div>
+        <h3>Community</h3>
+        <p>Connect with other learners, share resources, and grow together in your AI journey.</p>
+        <a href="{% url 'chatBot:chat_page' %}" class="action-link">Join Community →</a>
+    </div>
+</div>
+
+<footer>
+    <p>©2024 AIHub - Your Gateway to AI Learning</p>
+</footer>
 {% endblock %} 

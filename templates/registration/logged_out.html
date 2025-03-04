@@ -1,0 +1,63 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Logged Out - AIHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-color: #3b82f6;
+        --text-color: #1f2937;
+        --light-bg: #f3f4f6;
+        --white: #ffffff;
+    }
+
+    .logout-container {
+        max-width: 400px;
+        margin: 60px auto;
+        padding: 2rem;
+        background: var(--white);
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+
+    .logout-title {
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: var(--text-color);
+        margin-bottom: 1.5rem;
+    }
+
+    .logout-message {
+        color: #666;
+        margin-bottom: 2rem;
+        font-size: 1.1rem;
+    }
+
+    .home-button {
+        display: inline-block;
+        padding: 0.75rem 1.5rem;
+        background: var(--primary-color);
+        color: var(--white);
+        text-decoration: none;
+        border-radius: 4px;
+        font-weight: 500;
+        transition: background-color 0.2s;
+    }
+
+    .home-button:hover {
+        background-color: #2563eb;
+        color: var(--white);
+        text-decoration: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="logout-container">
+    <h2 class="logout-title">Successfully Logged Out</h2>
+    <p class="logout-message">Thank you for using AIHub. You have been successfully logged out.</p>
+    <a href="/" class="home-button">Return to Home</a>
+</div>
+{% endblock %} 

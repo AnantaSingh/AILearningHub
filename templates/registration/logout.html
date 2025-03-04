@@ -1,0 +1,15 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Logged Out - AIHub{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <h2 class="auth-title">Logged Out</h2>
+    <p style="text-align: center; margin-bottom: 1.5rem;">You have been successfully logged out.</p>
+    <div class="auth-links">
+        <p><a href="{% url 'login' %}">Login again</a></p>
+        <p><a href="{% url 'home' %}">Return to home page</a></p>
+    </div>
+</div>
+{% endblock %} 

@@ -1,6 +1,8 @@
 {% extends 'base/base.html' %}
 {% load static %}
 
+{% block title %}Search Results - AI Learning Hub{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
     <!-- Local Database Search Form -->
@@ -110,23 +112,41 @@
                 {% endfor %}
             </div>
         {% else %}
+            <!-- Landing Page Style UI when no results -->
             <div class="text-center mt-5">
-                <h3>Search for AI Resources</h3>
-                <p class="lead">Find GitHub repositories and research papers related to AI</p>
-                <div class="row justify-content-center mt-4">
+                <h1 class="display-4">AI Learning Hub</h1>
+                <p class="lead">Discover AI resources, research papers, and GitHub projects</p>
+                <hr class="my-4">
+                <div class="row justify-content-center">
                     <div class="col-md-4">
-                        <div class="card">
+                        <a href="{% url 'search:search' %}" class="btn btn-primary btn-lg btn-block mb-3">
+                            <i class="fas fa-search"></i> Search Resources
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="{% url 'github_explorer' %}" class="btn btn-success btn-lg btn-block mb-3">
+                            <i class="fab fa-github"></i> GitHub Explorer
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Featured Cards -->
+                <div class="row justify-content-center mt-5">
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 shadow-sm">
                             <div class="card-body">
-                                <h5><i class="fab fa-github"></i> GitHub Repositories</h5>
-                                <p>Discover AI projects, libraries, and tools</p>
+                                <i class="fab fa-github fa-3x mb-3 text-primary"></i>
+                                <h5 class="card-title">GitHub Repositories</h5>
+                                <p class="card-text">Discover trending AI projects, libraries, and tools from the GitHub community.</p>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="card">
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 shadow-sm">
                             <div class="card-body">
-                                <h5><i class="fas fa-scroll"></i> Research Papers</h5>
-                                <p>Access latest AI research from arXiv</p>
+                                <i class="fas fa-scroll fa-3x mb-3 text-success"></i>
+                                <h5 class="card-title">Research Papers</h5>
+                                <p class="card-text">Access the latest AI research papers from arXiv and other sources.</p>
                             </div>
                         </div>
                     </div>
@@ -139,6 +159,34 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<style>
+.input-group {
+    background: #f8f9fa;
+    border-radius: 50px;
+    overflow: hidden;
+}
+
+.input-group input {
+    background: transparent;
+}
+
+.input-group .btn {
+    border-radius: 0 50px 50px 0;
+}
+
+.card {
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.btn-block {
+    display: block;
+    width: 100%;
+}
+</style>
 {% endblock %}
 
 {% block extra_js %}
