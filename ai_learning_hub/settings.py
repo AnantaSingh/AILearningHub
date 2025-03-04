@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'search',
     'bookmarks',
     'chatbot.apps.ChatbotConfig',
+    'accounts',
 ]
 
 MIDDLEWARE = [
@@ -152,6 +153,8 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 # Authentication settings
 LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = 'login'
+LOGOUT_REDIRECT_URL = None
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
