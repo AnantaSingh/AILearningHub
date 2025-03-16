@@ -24,7 +24,6 @@ from accounts.views import signup_view, CustomLogoutView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('core.urls')),
     path('search/', include('search.urls')),
     path('accounts/', include('allauth.urls')),
     path('bookmarks/', include('bookmarks.urls')),
@@ -39,4 +38,5 @@ urlpatterns = [
         template_name='registration/logged_out.html'
     ), name='logout'),
     path('accounts/signup/', signup_view, name='signup'),
+    path('', include('core.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

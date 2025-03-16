@@ -4,12 +4,14 @@
 {% block title %}Logged Out - AIHub{% endblock %}
 
 {% block content %}
-<div class="auth-container">
-    <h2 class="auth-title">Logged Out</h2>
-    <p style="text-align: center; margin-bottom: 1.5rem;">You have been successfully logged out.</p>
-    <div class="auth-links">
-        <p><a href="{% url 'login' %}">Login again</a></p>
-        <p><a href="{% url 'home' %}">Return to home page</a></p>
+<section class="hero-section">
+    <div class="hero-content">
+        <h1 class="hero-title">Logged Out</h1>
+        <p class="hero-subtitle">You have been successfully logged out.</p>
+        <div class="auth-buttons">
+            <a href="{% url 'login' %}" class="auth-button login-button">Login again</a>
+            <a href="{% url 'home' %}" class="auth-button signup-button">Return to home</a>
+        </div>
     </div>
-</div>
+</section>
 {% endblock %} 

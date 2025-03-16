@@ -1,0 +1,71 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}AI Learning Resources - AIHub{% endblock %}
+
+{% block content %}
+<section class="hero-section">
+    <div class="hero-content">
+        <h1 class="hero-title">AI Learning Resources</h1>
+        <p class="hero-subtitle">Explore curated learning resources from top platforms</p>
+    </div>
+</section>
+
+<div class="grid-container">
+    <!-- Coursera -->
+    <div class="grid-item">
+        <div class="icon">
+            <i class="fas fa-graduation-cap"></i>
+        </div>
+        <h3>Coursera</h3>
+        <p>Offers a wide range of AI and Machine Learning courses from top universities and companies.</p>
+        <p class="text-muted small">Free to audit, paid certificates</p>
+        <a href="https://www.coursera.org/browse/data-science/machine-learning" 
+           class="action-link"
+           target="_blank" 
+           rel="noopener noreferrer">Visit Coursera →</a>
+    </div>
+
+    <!-- Udacity -->
+    <div class="grid-item">
+        <div class="icon">
+            <i class="fas fa-laptop-code"></i>
+        </div>
+        <h3>Udacity</h3>
+        <p>Provides comprehensive AI nanodegree programs and individual courses.</p>
+        <p class="text-muted small">Paid programs</p>
+        <a href="https://www.udacity.com/school-of-ai" 
+           class="action-link"
+           target="_blank" 
+           rel="noopener noreferrer">Visit Udacity →</a>
+    </div>
+
+    <!-- Fast.ai -->
+    <div class="grid-item">
+        <div class="icon">
+            <i class="fas fa-rocket"></i>
+        </div>
+        <h3>Fast.ai</h3>
+        <p>Practical Deep Learning for Coders with cutting-edge techniques.</p>
+        <p class="text-muted small">Free</p>
+        <a href="https://www.fast.ai/" 
+           class="action-link"
+           target="_blank" 
+           rel="noopener noreferrer">Visit Fast.ai →</a>
+    </div>
+
+    <!-- MIT AI Course -->
+    <div class="grid-item">
+        <div class="icon">
+            <i class="fas fa-university"></i>
+        </div>
+        <h3>MIT AI Course</h3>
+        <p>Introduction to Artificial Intelligence with Python from MIT OpenCourseWare.</p>
+        <p class="text-muted small">Free</p>
+        <a href="https://ocw.mit.edu/courses/6-034-artificial-intelligence-fall-2010/" 
+           class="action-link"
+           target="_blank" 
+           rel="noopener noreferrer">Visit MIT Course →</a>
+    </div>
+</div>
+{% endblock %} 
