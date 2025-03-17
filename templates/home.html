@@ -29,14 +29,14 @@
 
 <!-- Grid Section -->
 <div class="grid-container">
-    <!-- Open Source Projects -->
+    <!-- AI Handbooks -->
     <div class="grid-item">
         <div class="icon">
-            <i class="fab fa-github"></i>
+            <i class="fas fa-book"></i>
         </div>
-        <h3>Open Source Projects</h3>
-        <p>Discover and explore open-source AI projects. Learn from real-world implementations and contribute to the community.</p>
-        <a href="{% url 'github_explorer' %}" class="action-link">Explore Projects →</a>
+        <h3>AI handbooks and documentations</h3>
+        <p>Find the best AI handbooks and documentations.</p>
+        <a href="{% url 'core:ai_handbooks' %}" class="action-link">Explore handbooks →</a>
     </div>
 
     <!-- GitHub Repositories -->
@@ -86,7 +86,7 @@
         </div>
         <h3>Community</h3>
         <p>Connect with other learners, share resources, and grow together in your AI journey.</p>
-        <a href="{% url 'chatBot:chat_page' %}" class="action-link">Join Community →</a>
+        <a href="{% url 'core:communities' %}" class="action-link">Join Community →</a>
     </div>
 </div>
 {% endblock %} 

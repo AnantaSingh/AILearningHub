@@ -14,7 +14,13 @@ def home(request):
     return render(request, 'home.html')
 
 def ai_resources(request):
-    return render(request, 'ai_resources.html')
+    return render(request, 'core/ai_resources.html')
+
+def communities(request):
+    return render(request, 'core/communities.html')
+
+def ai_handbooks(request):
+    return render(request, 'core/ai_handbooks.html')
 
 def research_papers(request):
     # Debug: Log all bookmarks

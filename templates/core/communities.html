@@ -1,0 +1,59 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}AI Learning Resources - AIHub{% endblock %}
+
+{% block content %}
+<section class="hero-section">
+    <div class="hero-content">
+        <h1 class="hero-title">Communities</h1>
+        <p class="hero-subtitle">Find the best communities in AI!</p>
+    </div>
+</section>
+
+<div class="grid-container">
+    <!-- Reddit ai -->
+    <div class="grid-item">
+        <div class="icon">
+            <i class="fas fa-graduation-cap"></i>
+        </div>
+        <h3>Reddit AI</h3>
+        <p>A community for AI enthusiasts to explore news, research, and discussions on artificial intelligence and machine learning.</p>
+        <p class="text-muted small">Free</p>
+        <a href="https://www.reddit.com/r/artificial/" 
+           class="action-link"
+           target="_blank" 
+           rel="noopener noreferrer">Visit Reddit AI →</a>
+    </div>
+
+    <!-- Towards Data Science -->
+    <div class="grid-item">
+        <div class="icon">
+            <i class="fas fa-laptop-code"></i>
+        </div>
+        <h3>Towards Data Science</h3>
+        <p>Offers insights, tutorials, and articles on artificial intelligence, machine learning, and data science from experts and enthusiasts.</p>
+        <p class="text-muted small">Free</p>
+        <a href="https://towardsdatascience.com/category/artificial-intelligence/" 
+           class="action-link"
+           target="_blank" 
+           rel="noopener noreferrer">Visit Towards Data Science →</a>
+    </div>
+
+    <!-- OpenAI Blogs -->
+    <div class="grid-item">
+        <div class="icon">
+            <i class="fas fa-rocket"></i>
+        </div>
+        <h3>OpenAI Blogs</h3>
+        <p>Shares research advancements, AI developments, and insights on artificial intelligence, safety, and policy from OpenAI.</p>
+        <p class="text-muted small">Free</p>
+        <a href="https://blogboard.io/source-feed/source/openai-blog" 
+           class="action-link"
+           target="_blank" 
+           rel="noopener noreferrer">Visit OpenAI Blogs →</a>
+    </div>
+
+    
+</div>
+{% endblock %} 
