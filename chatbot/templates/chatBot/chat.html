@@ -8,6 +8,29 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Marked.js for markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        // Configure marked options
+        marked.setOptions({
+            breaks: true,
+            gfm: true,
+            headerIds: false,
+            mangle: false,
+            sanitize: false
+        });
+    </script>
+    <!-- Tailwind Typography plugin -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {},
+            },
+            plugins: [
+                require('@tailwindcss/typography'),
+            ],
+        }
+    </script>
     <style>
         .chat-container {
             height: calc(100vh - 180px);
@@ -61,6 +84,29 @@
         }
         .suggestion-chip:hover {
             background-color: #d1d5db;
+        }
+        /* Markdown styles */
+        .prose {
+            max-width: none;
+        }
+        .prose p {
+            margin-bottom: 1em;
+        }
+        .prose ul {
+            list-style-type: disc;
+            padding-left: 1.5em;
+        }
+        .prose li {
+            margin-bottom: 0.5em;
+        }
+        .prose strong {
+            font-weight: 600;
+        }
+        .prose code {
+            background-color: #f3f4f6;
+            padding: 0.2em 0.4em;
+            border-radius: 0.25em;
+            font-size: 0.875em;
         }
     </style>
 </head>
@@ -211,13 +257,14 @@
                     // Hide typing indicator
                     typingIndicator.classList.add('hidden');
 
-                    if (response.ok && data.success) {
+                    if (data.success) {
                         // Add bot response
                         addMessage(data.response, 'bot');
                     } else {
                         // Add error message
                         const errorMessage = data.error || 'Sorry, I encountered an error. Please try again.';
                         addErrorMessage(errorMessage);
+                        console.error('Chatbot error:', errorMessage);
                     }
                 } catch (error) {
                     console.error('Error:', error);
@@ -237,13 +284,16 @@
                 messageDiv.className = 'flex items-start space-x-2 fade-in';
                 
                 if (sender === 'bot') {
+                    // Parse markdown before inserting into DOM
+                    const parsedContent = marked.parse(message);
+
                     messageDiv.innerHTML = `
                         <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center">
                             <i class="fas fa-robot text-white text-sm"></i>
                         </div>
                         <div class="flex flex-col space-y-4">
-                            <div class="bot-message p-3 max-w-[80%]">
-                                <p>${message}</p>
+                            <div class="bot-message p-3 max-w-[80%] prose prose-sm">
+                                ${parsedContent}
                             </div>
                             <div class="suggestions">
                                 <div class="suggestion-chip" data-message="Tell me more about ${getTopicFromMessage(message)}">Tell me more</div>
@@ -275,10 +325,17 @@
             }
 
             function addErrorMessage(message) {
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'error-message fade-in';
-                errorDiv.innerHTML = `<i class="fas fa-exclamation-circle mr-2"></i>${message}`;
-                messageContainer.appendChild(errorDiv);
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'flex items-start space-x-2 fade-in';
+                messageDiv.innerHTML = `
+                    <div class="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center">
+                        <i class="fas fa-exclamation-circle text-white text-sm"></i>
+                    </div>
+                    <div class="error-message max-w-[80%]">
+                        <p>${message}</p>
+                    </div>
+                `;
+                messageContainer.appendChild(messageDiv);
                 messageContainer.scrollTop = messageContainer.scrollHeight;
             }
 
