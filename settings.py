@@ -1,3 +1,12 @@
+import os
+import dotenv
+
+# Load environment variables
+dotenv.load_dotenv()
+
+# Google Gemini API Key
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
 INSTALLED_APPS = [
     # ... existing apps ...
     'accounts',
