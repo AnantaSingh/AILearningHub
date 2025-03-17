@@ -55,6 +55,14 @@ class Resource(models.Model):
     )
     rating = models.DecimalField(max_digits=3, decimal_places=2, default=0.00)
     votes_count = models.IntegerField(default=0)
+    
+    # Update the bookmarked_by field with proper related names
+    bookmarked_by = models.ManyToManyField(
+        User,
+        through='bookmarks.Bookmark',
+        related_name='bookmarked_resources_set',
+        related_query_name='bookmarked_resource'
+    )
 
     class Meta:
         verbose_name_plural = "Resources"

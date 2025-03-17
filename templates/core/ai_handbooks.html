@@ -1,0 +1,57 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}AI Learning Resources - AIHub{% endblock %}
+
+{% block content %}
+<section class="hero-section">
+    <div class="hero-content">
+        <h1 class="hero-title">AI Handbooks</h1>
+        <p class="hero-subtitle">Unlock the power of AI with expert handbooks and in-depth documentation—all in one place!</p>
+    </div>
+</section>
+
+<div class="grid-container">
+    <!--  Deep Learning Book -->
+    <div class="grid-item">
+        <div class="icon">
+            <i class="fas fa-book"></i>
+        </div>
+        <h3>Deep Learning Book</h3>
+        <p>Offers a comprehensive dive into neural networks and AI, perfect for mastering the foundations of deep learning!</p>
+        
+        <a href="https://www.deeplearningbook.org/" 
+           class="action-link"
+           target="_blank" 
+           rel="noopener noreferrer">Open handbook →</a>
+    </div>
+
+    <!-- Stanford CS229 lecture notes -->
+    <div class="grid-item">
+        <div class="icon">
+            <i class="fas fa-book"></i>
+        </div>
+        <h3>Stanford CS229 lecture notes</h3>
+        <p>Your ultimate guide to mastering machine learning, straight from the experts!</p>
+        <a href="https://cs229.stanford.edu/main_notes.pdf" 
+           class="action-link"
+           target="_blank" 
+           rel="noopener noreferrer">Open handbook→</a>
+    </div>
+
+    <!-- GenAI Handbook -->
+    <div class="grid-item">
+        <div class="icon">
+            <i class="fas fa-book"></i>
+        </div>
+        <h3>GenAI Handbook</h3>
+        <p>Your essential guide to mastering generative artificial intelligence!</p>
+        <a href="https://genai-handbook.github.io/" 
+           class="action-link"
+           target="_blank" 
+           rel="noopener noreferrer">Open handbook →</a>
+    </div>
+
+    
+</div>
+{% endblock %} 

@@ -1,0 +1,117 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Research Papers - AIHub{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="hero-content">
+        <h1 class="hero-title">Research Papers</h1>
+        <p class="hero-subtitle">Explore the latest AI research papers and academic publications</p>
+        <div class="search-container">
+            <form method="get" action="">
+                <input type="text" name="q" class="search-input" 
+                       placeholder="Search research papers..." 
+                       value="{{ query }}">
+                <button type="submit" class="search-button">Search</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<div class="container mt-4">
+    <div class="row">
+        <!-- Sidebar with filters -->
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Categories</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        <a href="?{% if query %}q={{ query }}&{% endif %}" 
+                           class="list-group-item list-group-item-action {% if not selected_category %}active{% endif %}">
+                            All Papers
+                            <span class="badge bg-secondary float-end">{{ total_papers }}</span>
+                        </a>
+                        {% for category in categories %}
+                        <a href="?{% if query %}q={{ query }}&{% endif %}category={{ category.source }}" 
+                           class="list-group-item list-group-item-action {% if selected_category == category.source %}active{% endif %}">
+                            {{ category.source }}
+                            <span class="badge bg-secondary float-end">{{ category.paper_count }}</span>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <div class="col-md-9">
+            {% if papers %}
+                <div class="row">
+                    {% for paper in papers %}
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100">
+                                <div class="card-header bg-success text-white">
+                                    <div>
+                                        <i class="fas fa-scroll"></i>
+                                        {{ paper.source }}
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ paper.title }}</h5>
+                                    <p class="card-text">{{ paper.description }}</p>
+                                    <div class="mt-2 small text-muted">
+                                        <div><strong>Source:</strong> {{ paper.source }}</div>
+                                        <div><strong>Added:</strong> {{ paper.created_at|date:"M d, Y" }}</div>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <a href="{{ paper.url }}" class="action-link" target="_blank">Read Paper →</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Pagination -->
+                {% if papers.has_other_pages %}
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if papers.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ papers.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}">&laquo;</a>
+                            </li>
+                        {% endif %}
+
+                        {% for num in papers.paginator.page_range %}
+                            {% if papers.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                            {% else %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if papers.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ papers.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}">&raquo;</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            {% else %}
+                <div class="alert alert-info">
+                    No research papers found{% if query %} for "{{ query }}"{% endif %}{% if selected_category %} in {{ selected_category }}{% endif %}.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

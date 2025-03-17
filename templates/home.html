@@ -3,167 +3,6 @@
 
 {% block title %}AIHub - AI Learning Platform{% endblock %}
 
-{% block extra_css %}
-<style>
-    :root {
-        --primary-color: #3b82f6;
-        --text-color: #1f2937;
-        --light-bg: #f3f4f6;
-        --white: #ffffff;
-    }
-
-    body {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        color: var(--text-color);
-        line-height: 1.6;
-    }
-
-    .hero-section {
-        background: var(--primary-color);
-        color: var(--white);
-        padding: 60px 0;
-        text-align: center;
-    }
-
-    .hero-content {
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 0 20px;
-    }
-
-    .hero-title {
-        font-size: 3rem;
-        font-weight: 700;
-        margin-bottom: 1rem;
-    }
-
-    .hero-subtitle {
-        font-size: 1.2rem;
-        margin-bottom: 2rem;
-    }
-
-    .search-container {
-        max-width: 600px;
-        margin: 0 auto;
-    }
-
-    .search-input {
-        width: 100%;
-        padding: 1rem;
-        font-size: 1rem;
-        border: none;
-        border-radius: 4px;
-    }
-
-    .search-button {
-        background: var(--text-color);
-        color: white;
-        border: none;
-        padding: 1rem 2rem;
-        border-radius: 4px;
-        cursor: pointer;
-        margin-top: 1rem;
-    }
-
-    .grid-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 2rem;
-        padding: 3rem 2rem;
-        max-width: 1200px;
-        margin: 0 auto;
-    }
-
-    .grid-item {
-        background: var(--white);
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
-        padding: 2rem;
-        transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .grid-item:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-    }
-
-    .grid-item h3 {
-        font-size: 1.3rem;
-        margin-bottom: 1rem;
-        color: var(--text-color);
-    }
-
-    .grid-item p {
-        color: #666;
-        margin-bottom: 1.5rem;
-    }
-
-    .grid-item .icon {
-        font-size: 1.5rem;
-        color: var(--primary-color);
-        margin-bottom: 1rem;
-    }
-
-    .grid-item .action-link {
-        color: var(--primary-color);
-        text-decoration: none;
-        font-weight: 500;
-    }
-
-    footer {
-        background: var(--text-color);
-        color: var(--white);
-        padding: 2rem 0;
-        text-align: center;
-        margin-top: 4rem;
-    }
-
-    @media (max-width: 768px) {
-        .hero-title {
-            font-size: 2rem;
-        }
-
-        .grid-container {
-            grid-template-columns: 1fr;
-            padding: 2rem 1rem;
-        }
-    }
-
-    .auth-buttons {
-        margin-top: 2rem;
-        display: flex;
-        justify-content: center;
-        gap: 1rem;
-    }
-
-    .auth-button {
-        padding: 0.75rem 1.5rem;
-        border-radius: 4px;
-        font-weight: 500;
-        text-decoration: none;
-        transition: background-color 0.2s;
-    }
-
-    .login-button {
-        background-color: var(--white);
-        color: var(--primary-color);
-    }
-
-    .login-button:hover {
-        background-color: #f3f4f6;
-    }
-
-    .signup-button {
-        background-color: var(--text-color);
-        color: var(--white);
-    }
-
-    .signup-button:hover {
-        background-color: #111827;
-    }
-</style>
-{% endblock %}
-
 {% block content %}
 <!-- Hero Section -->
 <section class="hero-section">
@@ -171,7 +10,7 @@
         <h1 class="hero-title">AIHub</h1>
         <p class="hero-subtitle">Unlock the World of AI Learning</p>
         <div class="search-container">
-            <form action="{% url 'search:search' %}" method="get">
+            <form action="{% url 'search:local_search' %}" method="get">
                 {% csrf_token %}
                 <input type="text" name="q" class="search-input" placeholder="Search AI tutorials, research papers, GitHub repositories...">
                 <button type="submit" class="search-button">Search</button>
@@ -190,14 +29,14 @@
 
 <!-- Grid Section -->
 <div class="grid-container">
-    <!-- Open Source Projects -->
+    <!-- AI Handbooks -->
     <div class="grid-item">
         <div class="icon">
-            <i class="fab fa-github"></i>
+            <i class="fas fa-book"></i>
         </div>
-        <h3>Open Source Projects</h3>
-        <p>Discover and explore open-source AI projects. Learn from real-world implementations and contribute to the community.</p>
-        <a href="{% url 'github_explorer' %}" class="action-link">Explore Projects →</a>
+        <h3>AI handbooks and documentations</h3>
+        <p>Find the best AI handbooks and documentations.</p>
+        <a href="{% url 'core:ai_handbooks' %}" class="action-link">Explore handbooks →</a>
     </div>
 
     <!-- GitHub Repositories -->
@@ -217,7 +56,7 @@
         </div>
         <h3>Research Papers</h3>
         <p>Explore the latest AI research papers and academic publications. Stay updated with cutting-edge developments.</p>
-        <a href="{% url 'search:search' %}?type=paper" class="action-link">Read Papers →</a>
+        <a href="{% url 'core:research_papers' %}" class="action-link">Read Papers →</a>
     </div>
 
     <!-- Personal Bookmarks -->
@@ -237,7 +76,7 @@
         </div>
         <h3>AI Resources</h3>
         <p>Access a curated collection of AI learning resources, tutorials, and guides.</p>
-        <a href="{% url 'search:local_search' %}" class="action-link">Browse Resources →</a>
+        <a href="{% url 'core:ai_resources' %}" class="action-link">Browse Resources →</a>
     </div>
 
     <!-- Community -->
@@ -247,11 +86,7 @@
         </div>
         <h3>Community</h3>
         <p>Connect with other learners, share resources, and grow together in your AI journey.</p>
-        <a href="{% url 'chatBot:chat_page' %}" class="action-link">Join Community →</a>
+        <a href="{% url 'core:communities' %}" class="action-link">Join Community →</a>
     </div>
 </div>
-
-<footer>
-    <p>©2024 AIHub - Your Gateway to AI Learning</p>
-</footer>
 {% endblock %} 

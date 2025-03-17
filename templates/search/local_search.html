@@ -1,8 +1,29 @@
 {% extends 'base/base.html' %}
 {% load static %}
 
+{% block title %}Search Resources - AIHub{% endblock %}
+
 {% block content %}
-<div class="container-fluid mt-4">
+<!-- Hero Section with Search -->
+<section class="hero-section">
+    <div class="hero-content">
+        <h1 class="hero-title">Search Resources</h1>
+        <p class="hero-subtitle">Find AI tutorials, research papers, and GitHub repositories</p>
+        <div class="search-container">
+            <form method="get" action="{% url 'search:local_search' %}">
+                <input type="text" name="q" class="search-input" 
+                       placeholder="Search saved resources..." 
+                       value="{{ query }}">
+                {% if selected_category %}
+                <input type="hidden" name="category" value="{{ selected_category }}">
+                {% endif %}
+                <button type="submit" class="search-button">Search</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<div class="container-fluid">
     <div class="row">
         <!-- Sidebar with filters -->
         <div class="col-md-3">
@@ -40,21 +61,6 @@
 
         <!-- Main content -->
         <div class="col-md-9">
-            <!-- Search Form -->
-            <div class="row justify-content-center mb-4">
-                <div class="col-md-8">
-                    <h4 class="mb-3">Search Saved Resources</h4>
-                    <form method="get" class="d-flex">
-                        <input type="text" name="q" class="form-control form-control-lg me-2" 
-                               placeholder="Search saved resources..." value="{{ query }}">
-                        {% if selected_category %}
-                        <input type="hidden" name="category" value="{{ selected_category }}">
-                        {% endif %}
-                        <button class="btn btn-success" type="submit">Search</button>
-                    </form>
-                </div>
-            </div>
-
             <!-- Results Section -->
             <div class="results-section">
                 {% if query or selected_category %}
@@ -73,7 +79,7 @@
                     <div class="row mb-5">
                         {% for resource in github_results %}
                             <div class="col-md-6 mb-4">
-                                <div class="card h-100 border-primary">
+                                <div class="card">
                                     <div class="card-header bg-primary text-white d-flex justify-content-between">
                                         <i class="fab fa-github"></i>
                                         {% if resource.metadata.stars %}
@@ -88,7 +94,7 @@
                                         {% endif %}
                                     </div>
                                     <div class="card-footer d-flex justify-content-between">
-                                        <a href="{{ resource.url }}" class="btn btn-outline-primary btn-sm" target="_blank">View</a>
+                                        <a href="{{ resource.url }}" class="action-link" target="_blank">View →</a>
                                         {% if user.is_authenticated %}
                                         <button class="btn bookmark-btn {% if resource.is_bookmarked %}btn-primary{% else %}btn-outline-primary{% endif %} btn-sm"
                                                 data-url="{{ resource.url }}"
@@ -116,7 +122,7 @@
                     <div class="row mb-5">
                         {% for resource in paper_results %}
                             <div class="col-md-6 mb-4">
-                                <div class="card h-100 border-success">
+                                <div class="card">
                                     <div class="card-header bg-success text-white">
                                         <i class="fas fa-scroll"></i> {{ resource.source }}
                                         {% if resource.metadata.github_url %}
@@ -135,7 +141,7 @@
                                         {% endif %}
                                     </div>
                                     <div class="card-footer d-flex justify-content-between">
-                                        <a href="{{ resource.url }}" class="btn btn-outline-success btn-sm" target="_blank">View</a>
+                                        <a href="{{ resource.url }}" class="action-link" target="_blank">View →</a>
                                         {% if user.is_authenticated %}
                                         <button class="btn bookmark-btn {% if resource.is_bookmarked %}btn-primary{% else %}btn-outline-primary{% endif %} btn-sm"
                                                 data-url="{{ resource.url }}"
@@ -163,7 +169,7 @@
                     <div class="row mb-5">
                         {% for resource in course_results %}
                             <div class="col-md-4 mb-3">
-                                <div class="card h-100 border-info">
+                                <div class="card">
                                     <div class="card-header bg-info text-white d-flex justify-content-between">
                                         <i class="fas fa-graduation-cap"></i> {{ resource.metadata.platform }}
                                         {% if resource.metadata.specialization %}
@@ -183,7 +189,7 @@
                                         </div>
                                     </div>
                                     <div class="card-footer d-flex justify-content-between">
-                                        <a href="{{ resource.url }}" class="btn btn-outline-info btn-sm" target="_blank">View Course</a>
+                                        <a href="{{ resource.url }}" class="action-link" target="_blank">View Course →</a>
                                         {% if user.is_authenticated %}
                                         <button class="btn bookmark-btn {% if resource.is_bookmarked %}btn-primary{% else %}btn-outline-primary{% endif %} btn-sm"
                                                 data-url="{{ resource.url }}"
@@ -206,8 +212,4 @@
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 {% endblock %} 
