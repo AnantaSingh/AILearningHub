@@ -1,0 +1,60 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Submit AI Learning Resource</h2>
+    <div class="card">
+        <div class="card-body">
+            <form method="POST" action="{% url 'resources:submit_resource' %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="title" class="form-label">Title*</label>
+                    <input type="text" class="form-control" id="title" name="title" required>
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description*</label>
+                    <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="url" class="form-label">URL*</label>
+                    <input type="url" class="form-control" id="url" name="url" required>
+                </div>
+                <div class="mb-3">
+                    <label for="resource_type" class="form-label">Resource Type*</label>
+                    <select class="form-control" id="resource_type" name="resource_type" required>
+                        <option value="TUTORIAL">Tutorial</option>
+                        <option value="COURSE">Course</option>
+                        <option value="HANDBOOK">Handbook</option>
+                        <option value="GITHUB">GitHub Repository</option>
+                        <option value="PAPER">Research Paper</option>
+                        <option value="BLOG">Blog Post</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="difficulty_level" class="form-label">Difficulty Level*</label>
+                    <select class="form-control" id="difficulty_level" name="difficulty_level" required>
+                        <option value="BEGINNER">Beginner</option>
+                        <option value="INTERMEDIATE">Intermediate</option>
+                        <option value="ADVANCED">Advanced</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="tags" class="form-label">Tags (comma-separated)</label>
+                    <input type="text" class="form-control" id="tags" name="tags" placeholder="machine learning, neural networks, deep learning">
+                </div>
+                <button type="submit" class="btn btn-primary">Submit for Review</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Sync resource type with source
+document.getElementById('resource_type').addEventListener('change', function() {
+    const resourceType = this.value;
+    // This mapping will be used when submitting the form
+    console.log('Selected resource type:', resourceType);
+});
+</script>
+{% endblock %}

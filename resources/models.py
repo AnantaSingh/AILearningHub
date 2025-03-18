@@ -32,7 +32,7 @@ class Resource(models.Model):
 
     title = models.CharField(max_length=200)
     description = models.TextField()
-    url = models.URLField()
+    url = models.URLField(unique=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     resource_type = models.CharField(max_length=20, choices=RESOURCE_TYPES)
     created_at = models.DateTimeField(auto_now_add=True)

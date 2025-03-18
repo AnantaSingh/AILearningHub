@@ -1,14 +1,17 @@
-function saveToDb(btn) {
-    const isAlreadySaved = btn.classList.contains('btn-success');
-    const data = {
-        url: btn.dataset.url,
-        title: btn.dataset.title,
-        description: btn.dataset.description,
-        source: btn.dataset.source,
-        metadata: JSON.parse(btn.dataset.metadata)
+function saveToDb(button) {
+    const card = button.closest('.resource-card');
+    
+    // Basic required data
+    const resourceData = {
+        url: card.dataset.url,
+        title: card.dataset.title,
+        description: card.dataset.description,
+        source: card.dataset.source || 'GITHUB'
     };
 
-    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+    console.log("Sending data:", resourceData);  // Debug log
+
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
     fetch('/api/resources/save/', {
         method: 'POST',
@@ -16,33 +19,23 @@ function saveToDb(btn) {
             'Content-Type': 'application/json',
             'X-CSRFToken': csrfToken
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(resourceData),
+        credentials: 'same-origin'
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
-    .then(result => {
-        if (result.status === 'success') {
-            if (!isAlreadySaved) {
-                btn.classList.remove('btn-outline-success');
-                btn.classList.add('btn-success');
-                btn.innerHTML = '<i class="fas fa-check"></i> Saved to DB';
-            } else {
-                btn.classList.remove('btn-success');
-                btn.classList.add('btn-outline-success');
-                btn.innerHTML = '<i class="fas fa-database"></i> Save to DB';
-            }
+    .then(response => response.json())
+    .then(data => {
+        console.log("Response:", data);  // Debug log
+        if (data.status === 'success') {
+            showAlert('success', 'Resource saved successfully!');
+            button.classList.toggle('btn-success');
+            button.classList.toggle('btn-danger');
+            button.innerHTML = button.classList.contains('btn-success') ? 'Save to DB' : 'Remove from DB';
+        } else {
+            throw new Error(data.message || 'Failed to save resource');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        if (error.message.includes('403')) {
-            alert('You must be an admin to save to database');
-        } else {
-            alert('Error saving to database');
-        }
+        showAlert('danger', 'Failed to save resource: ' + error.message);
     });
 } 

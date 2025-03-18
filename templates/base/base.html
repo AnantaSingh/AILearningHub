@@ -207,15 +207,35 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav">
+                    <!-- Common items for all users -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    
                     {% if user.is_authenticated %}
-                        {% if user.is_superuser %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'admin_portal' %}">
-                                <i class="fas fa-cog"></i> Admin Portal
-                            </a>
-                        </li>
+                        {% if user.is_staff %}
+                            <!-- Admin only -->
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'resources:pending_approvals' %}">
+                                    <i class="fas fa-check-circle"></i> Approve Requests
+                                </a>
+                            </li>
+                        {% else %}
+                            <!-- Regular user options -->
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'resources:submit_resource' %}">
+                                    <i class="fas fa-plus-circle"></i> Submit Resource
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'resources:my_submissions' %}">
+                                    <i class="fas fa-list"></i> My Submissions
+                                </a>
+                            </li>
                         {% endif %}
+                        
+                        <!-- Other authenticated user options -->
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'bookmarks:list' %}">
                                 <i class="fas fa-bookmark"></i> My Bookmarks

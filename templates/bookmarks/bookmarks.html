@@ -1,0 +1,32 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    {% csrf_token %}
+    <div class="bookmarks-container">
+        {% if bookmarks %}
+            {% for bookmark in bookmarks %}
+                <div class="resource-card card mb-3"
+                     data-url="{{ bookmark.url }}"
+                     data-title="{{ bookmark.title }}"
+                     data-description="{{ bookmark.description }}"
+                     data-source="{{ bookmark.source }}"
+                     data-resource-type="{{ bookmark.resource_type }}">
+                    <!-- ... card content ... -->
+                    <button onclick="toggleBookmark(this)" 
+                            class="btn btn-sm {% if bookmark.is_bookmarked %}btn-danger bookmarked{% else %}btn-success{% endif %}">
+                        {% if bookmark.is_bookmarked %}Remove Bookmark{% else %}Add Bookmark{% endif %}
+                    </button>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-info">No bookmarks yet!</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/bookmarks.js' %}"></script>
+{% endblock %} 

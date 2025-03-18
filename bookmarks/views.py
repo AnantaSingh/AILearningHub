@@ -3,65 +3,82 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
-from resources.models import Resource
+from resources.models import Resource, Category
 from .models import Bookmark
 import json
 
 # Create your views here.
 
-@require_POST
 @login_required
+@require_POST
 def toggle_bookmark(request):
     try:
         data = json.loads(request.body)
-        print("Received bookmark data:", data)
+        url = data.get('url')
         
-        # Map source to resource_type
-        source_to_type = {
-            'GitHub': 'GITHUB',
-            'arXiv': 'PAPER',
-            'PapersWithCode': 'PAPER',
-            'Coursera': 'COURSE'
-        }
-        resource_type = source_to_type.get(data.get('source', ''), 'GITHUB')
-        
-        # Check if bookmark exists
-        bookmark = Bookmark.objects.filter(
-            user=request.user,
-            url=data['url']
-        ).first()
-        
-        if bookmark:
-            print("Found existing bookmark:", bookmark.source)
-            if bookmark.is_admin_saved:
-                # If admin saved, just toggle bookmark flag
-                bookmark.is_bookmarked = not bookmark.is_bookmarked
-                bookmark.save()
-            else:
-                # If only bookmarked, delete it
-                bookmark.delete()
-            
-            return JsonResponse({'status': 'success', 'action': 'removed'})
+        # First, handle potential duplicate resources
+        existing_resources = Resource.objects.filter(url=url)
+        if existing_resources.exists():
+            # Use the first resource and delete others
+            resource = existing_resources.first()
+            # Update bookmarks to point to the first resource before deleting others
+            Bookmark.objects.filter(resource__in=existing_resources.exclude(id=resource.id)).update(resource=resource)
+            existing_resources.exclude(id=resource.id).delete()
         else:
-            print("Creating new bookmark with source:", data.get('source'))
-            # Create new bookmark with default values if data missing
-            bookmark = Bookmark.objects.create(
-                user=request.user,
-                url=data['url'],
+            # Create new resource if none exists
+            category = Category.objects.get_or_create(
+                name='Uncategorized', 
+                defaults={'slug': 'uncategorized'}
+            )[0]
+            
+            resource = Resource.objects.create(
+                url=url,
                 title=data.get('title', ''),
                 description=data.get('description', ''),
-                source=data.get('source', ''),
-                resource_type=resource_type,  # Add the mapped resource_type
-                metadata=data.get('metadata', {}),
-                is_bookmarked=True,
-                is_admin_saved=False
+                resource_type=data.get('resource_type', 'GITHUB'),
+                category=category,
+                author=request.user
             )
-            print("Created bookmark with source:", bookmark.source)
-            return JsonResponse({'status': 'success', 'action': 'added'})
-            
+
+        # Get or create bookmark
+        bookmark = Bookmark.objects.filter(
+            user=request.user,
+            resource=resource
+        ).first()
+
+        if bookmark:
+            # If bookmark exists, toggle is_bookmarked
+            bookmark.is_bookmarked = not bookmark.is_bookmarked
+            bookmark.save()
+            message = "Bookmark removed" if not bookmark.is_bookmarked else "Bookmark added"
+        else:
+            # Create new bookmark
+            bookmark = Bookmark.objects.create(
+                user=request.user,
+                resource=resource,
+                title=data.get('title', ''),
+                description=data.get('description', ''),
+                url=url,
+                resource_type=data.get('resource_type', 'GITHUB'),
+                source=data.get('source', 'GITHUB'),
+                is_bookmarked=True
+            )
+            message = "Bookmark added"
+
+        print(f"Bookmark status: user={request.user.username}, url={url}, is_bookmarked={bookmark.is_bookmarked}")
+
+        return JsonResponse({
+            'status': 'success',
+            'message': message,
+            'is_bookmarked': bookmark.is_bookmarked
+        })
+
     except Exception as e:
         print(f"Error in toggle_bookmark: {str(e)}")
-        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        }, status=400)
 
 @login_required
 def bookmark_list(request):

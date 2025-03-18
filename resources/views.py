@@ -1,15 +1,18 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from github import Github
 from django.conf import settings
 import logging
 from django.core.cache import cache
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_http_methods
 from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.decorators import login_required
 import json
 from bookmarks.models import Bookmark
-from .models import SavedResource
+from .models import SavedResource, Resource, Category
 from .services.search_service import AIResourceSearchService
+from django.contrib import messages
+from django.urls import reverse
 
 logger = logging.getLogger(__name__)
 
@@ -151,3 +154,136 @@ def admin_portal(request):
         'papers_count': papers_count,
         'courses_count': courses_count,
     })
+
+@login_required
+@require_POST
+def save_resource(request):
+    try:
+        data = json.loads(request.body)
+        url = data.get('url')
+        
+        # Get or create resource
+        resource = Resource.objects.get_or_create(
+            url=url,
+            defaults={
+                'title': data.get('title', ''),
+                'description': data.get('description', ''),
+                'resource_type': data.get('resource_type', 'GITHUB'),
+                'category': Category.objects.get_or_create(name='Uncategorized')[0],
+                'author': request.user
+            }
+        )[0]
+
+        # Create bookmark with is_bookmarked=False for admin saves
+        bookmark = Bookmark.objects.create(
+            user=request.user,
+            resource=resource,
+            title=data.get('title', ''),
+            description=data.get('description', ''),
+            url=url,
+            resource_type=data.get('resource_type', 'GITHUB'),
+            source=data.get('source', 'GITHUB'),
+            is_bookmarked=False,  # Set to False for admin saves
+            is_admin_saved=True
+        )
+
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Resource saved successfully',
+            'resource_id': resource.id,
+            'bookmark_id': bookmark.id
+        })
+
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        }, status=400)
+
+@login_required
+def submit_resource(request):
+    if request.method == 'POST':
+        try:
+            category = Category.objects.get_or_create(
+                name='Uncategorized',
+                defaults={'slug': 'uncategorized'}
+            )[0]
+            
+            # Map resource_type to correct source format
+            resource_type = request.POST['resource_type']
+            source_mapping = {
+                'TUTORIAL': 'Tutorial',
+                'COURSE': 'Course',
+                'HANDBOOK': 'Handbook',
+                'GITHUB': 'GitHub',
+                'PAPER': 'Research Paper',
+                'BLOG': 'Blog'
+            }
+            
+            resource = Resource.objects.create(
+                title=request.POST['title'],
+                description=request.POST['description'],
+                url=request.POST['url'],
+                resource_type=resource_type,
+                difficulty_level=request.POST['difficulty_level'],
+                tags=request.POST['tags'],
+                category=category,
+                author=request.user,
+                is_approved=False
+            )
+
+            # Create bookmark with proper source format
+            Bookmark.objects.create(
+                user=request.user,
+                resource=resource,
+                title=resource.title,
+                description=resource.description,
+                url=resource.url,
+                resource_type=resource_type,
+                source=source_mapping.get(resource_type, 'Other'),
+                is_bookmarked=True,
+                is_admin_saved=False
+            )
+
+            messages.success(request, 'Resource submitted successfully! It will be reviewed by an admin.')
+            return redirect('resources:my_submissions')
+        except Exception as e:
+            messages.error(request, f'Error submitting resource: {str(e)}')
+            return redirect('resources:submit_resource')
+    
+    return render(request, 'resources/submit.html')
+
+@login_required
+def my_submissions(request):
+    submissions = Resource.objects.filter(author=request.user).order_by('-created_at')
+    return render(request, 'resources/my_submissions.html', {
+        'submissions': submissions
+    })
+
+@staff_member_required
+def pending_approvals(request):
+    # Get resources that are not approved and were submitted by users (not admin saved)
+    pending_resources = Resource.objects.filter(
+        is_approved=False,
+        bookmarks__is_admin_saved=False  # Changed from True to False to show user submissions
+    ).distinct().order_by('-created_at')
+    
+    return render(request, 'resources/pending_approvals.html', {
+        'pending_resources': pending_resources
+    })
+
+@staff_member_required
+@require_POST
+def approve_resource(request, resource_id):
+    resource = get_object_or_404(Resource, id=resource_id)
+    resource.is_approved = True
+    resource.save()
+    
+    # Update the corresponding bookmark's admin_approved status
+    Bookmark.objects.filter(
+        resource=resource,
+        is_admin_saved=False  # Changed from True to False to update user submissions
+    ).update(is_admin_saved=True)  # Mark as admin approved
+    
+    messages.success(request, f'Resource "{resource.title}" has been approved.')
+    return redirect('resources:pending_approvals')

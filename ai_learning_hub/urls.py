@@ -21,15 +21,18 @@ from django.conf.urls.static import static
 from resources.views import trending_repos, github_explorer_view, admin_portal
 from django.contrib.auth import views as auth_views
 from accounts.views import signup_view, CustomLogoutView
+from core import views  # Import your home view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', views.home, name='home'),  # Add this line for home URL
     path('search/', include('search.urls')),
     path('accounts/', include('accounts.urls')),
     path('bookmarks/', include('bookmarks.urls')),
+    path('resources/', include('resources.urls')),
     path('api/github/trending/', trending_repos, name='trending_repos'),
     path('github-explorer/', github_explorer_view, name='github_explorer'),
-    path('api/resources/', include('resources.urls')),
+    path('api/', include('resources.urls')),
     path('admin-portal/', admin_portal, name='admin_portal'),
     path('chatbot/', include('chatbot.urls')),
     # Authentication URLs

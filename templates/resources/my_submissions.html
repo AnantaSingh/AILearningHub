@@ -1,0 +1,32 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>My Submissions</h2>
+    <div class="mb-3">
+        <a href="{% url 'resources:submit_resource' %}" class="btn btn-primary">Submit New Resource</a>
+    </div>
+    
+    {% if submissions %}
+        {% for resource in submissions %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">{{ resource.title }}</h5>
+                <p class="card-text">{{ resource.description }}</p>
+                <p>
+                    <strong>Status:</strong> 
+                    {% if resource.is_approved %}
+                        <span class="badge bg-success">Approved</span>
+                    {% else %}
+                        <span class="badge bg-warning">Pending Review</span>
+                    {% endif %}
+                </p>
+                <a href="{{ resource.url }}" target="_blank" class="btn btn-sm btn-primary">View Resource</a>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-info">You haven't submitted any resources yet.</div>
+    {% endif %}
+</div>
+{% endblock %}
