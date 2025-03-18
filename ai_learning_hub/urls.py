@@ -25,7 +25,7 @@ from accounts.views import signup_view, CustomLogoutView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('search/', include('search.urls')),
-    path('accounts/', include('allauth.urls')),
+    path('accounts/', include('accounts.urls')),
     path('bookmarks/', include('bookmarks.urls')),
     path('api/github/trending/', trending_repos, name='trending_repos'),
     path('github-explorer/', github_explorer_view, name='github_explorer'),
