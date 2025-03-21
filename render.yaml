@@ -15,6 +15,16 @@ services:
         generateValue: true
       - key: DJANGO_DEBUG
         value: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GITHUB_ACCESS_TOKEN
+        sync: false
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+      - key: AWS_REGION
+        sync: false
 
 databases:
   - name: ai_learning_hub_db

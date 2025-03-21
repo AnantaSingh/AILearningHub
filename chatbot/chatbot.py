@@ -3,6 +3,7 @@ import google.generativeai as genai
 import dotenv
 import logging
 from pathlib import Path
+from django.conf import settings
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -28,55 +29,18 @@ except Exception as e:
 
 class ChatBot:
     def __init__(self):
+        self.api_key = os.getenv('GEMINI_API_KEY')
+        self.is_configured = False
+        if self.api_key:
+            genai.configure(api_key=self.api_key)
+            self.model = genai.GenerativeModel('gemini-pro')
+            self.is_configured = True
+
+    def get_response(self, message):
+        if not self.is_configured:
+            return "Chatbot is not configured. Please set GEMINI_API_KEY in environment variables."
         try:
-            # Initialize the model with the latest Gemini Pro model
-            self.model = genai.GenerativeModel('models/gemini-1.5-pro-latest')
-            logger.info("ChatBot initialized successfully")
+            response = self.model.generate_content(message)
+            return response.text
         except Exception as e:
-            logger.error(f"Error initializing ChatBot: {str(e)}")
-            raise
-
-    def get_response(self, user_input):
-        """Generate a response using Google's Gemini API."""
-        if not user_input.strip():
-            return {"success": False, "error": "Please ask something specific about AI or ML."}
-
-        try:
-            # System prompt to focus on AI topics
-            system_prompt = """You are an AI Learning Assistant specialized in artificial intelligence, machine learning, deep learning, and related technologies. 
-            Your responses should:
-            1. Focus exclusively on AI/ML/DL topics
-            2. Provide accurate, up-to-date information
-            3. Include practical examples and use cases
-            4. Explain concepts in a clear, structured way
-            5. Use markdown formatting for better readability
-            6. If the question is not related to AI/ML/DL, politely redirect to AI topics
-            
-            If the user's question is not related to AI/ML/DL, respond with:
-            "I'm specialized in AI and ML topics. Could you please rephrase your question to focus on artificial intelligence, machine learning, or related technologies?"
-            """
-
-            # Combine system prompt with user input
-            prompt = f"{system_prompt}\n\nUser: {user_input}\n\nAssistant:"
-            
-            # Generate response with the focused prompt
-            response = self.model.generate_content(prompt)
-            
-            if response and response.text:
-                return {
-                    "success": True,
-                    "response": response.text
-                }
-            else:
-                return {
-                    "success": False,
-                    "error": "I couldn't generate a response. Can you rephrase?"
-                }
-        except Exception as e:
-            logger.error(f"Error generating response: {str(e)}")
-            logger.error(f"Error type: {type(e)}")
-            logger.error(f"Error details: {e.__dict__}")
-            return {
-                "success": False,
-                "error": f"An error occurred: {str(e)}"
-            }
+            return f"Error: {str(e)}"
