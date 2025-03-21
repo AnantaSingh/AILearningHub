@@ -18,14 +18,13 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from resources.views import trending_repos, github_explorer_view, admin_portal
 from django.contrib.auth import views as auth_views
 from accounts.views import signup_view, CustomLogoutView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('core.urls')),
-    path('resources/', include('resources.urls', namespace='resources')),  # This includes all resources URLs
+    path('resources/', include('resources.urls', namespace='resources')),
     path('search/', include('search.urls', namespace='search')),
     path('bookmarks/', include('bookmarks.urls', namespace='bookmarks')),
     path('chatbot/', include('chatbot.urls', namespace='chatbot')),
