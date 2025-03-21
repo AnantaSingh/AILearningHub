@@ -7,15 +7,19 @@ from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
+from django.contrib import messages
 
 def signup_view(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            # Explicitly use ModelBackend for authentication
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-            return redirect('core:home')
+            messages.success(request, 'Account created successfully!')
+            return redirect('/')
+        else:
+            for error in form.errors.values():
+                messages.error(request, error)
     else:
         form = UserCreationForm()
     return render(request, 'registration/signup.html', {'form': form})

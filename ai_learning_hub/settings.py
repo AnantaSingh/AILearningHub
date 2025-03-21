@@ -13,7 +13,12 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
-import dj_database_url
+
+# Only import dj_database_url if available
+try:
+    import dj_database_url
+except ImportError:
+    dj_database_url = None
 
 load_dotenv()
 
@@ -98,17 +103,18 @@ WSGI_APPLICATION = 'ai_learning_hub.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 # Database Configuration
-if 'DATABASE_URL' in os.environ:
-    # Use Render's database URL if available
+if dj_database_url and 'DATABASE_URL' in os.environ:
+    # Production/Render environment
     DATABASES = {
         'default': dj_database_url.config(
+            default=os.getenv('DATABASE_URL'),
             conn_max_age=600,
             conn_health_checks=True,
-            ssl_require=True,
+            ssl_require=not DEBUG,
         )
     }
 else:
-    # Local development database
+    # Local development environment
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
@@ -169,26 +175,26 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Crispy Forms
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
-# Authentication settings
+# Session Settings
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'
+
+# Authentication Settings
 LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
 LOGIN_URL = 'login'
-LOGOUT_REDIRECT_URL = None
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_USERNAME_REQUIRED = True
-ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
-ACCOUNT_EMAIL_VERIFICATION = 'none'
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # django-allauth settings
+ACCOUNT_EMAIL_REQUIRED = False
+ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_AUTHENTICATION_METHOD = 'username'
+ACCOUNT_EMAIL_VERIFICATION = 'none'
 SITE_ID = 1
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
 # AWS Settings
@@ -227,3 +233,8 @@ GITHUB_ACCESS_TOKEN = os.getenv('GITHUB_ACCESS_TOKEN')
 CSRF_TRUSTED_ORIGINS = [
     'https://*.onrender.com'
 ]
+
+# Default primary key field type
+# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
