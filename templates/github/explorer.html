@@ -1,9 +1,20 @@
 {% extends 'base/base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<script src="{% static 'js/github-explorer.js' %}"></script>
+{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
     <h2>GitHub Repository Explorer</h2>
-    <p>This feature is coming soon!</p>
-    <a href="{% url 'home' %}" class="btn btn-primary">Back to Home</a>
+    
+    <div id="github-trending">
+        <div class="row" id="trending-repos">
+            <!-- Repositories will be loaded here -->
+        </div>
+    </div>
 </div>
+
+{% csrf_token %}
 {% endblock %} 

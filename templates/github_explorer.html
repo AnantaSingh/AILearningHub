@@ -24,7 +24,23 @@
 document.addEventListener('DOMContentLoaded', function() {
     fetch('/api/github/trending/')
         .then(response => response.json())
-        .then(repos => {
+        .then(data => {
+            console.log('Received data:', data);
+            if (!data || !data.data) {
+                throw new Error('Invalid response format');
+            }
+
+            const repos = data.data;
+            if (repos.length === 0) {
+                document.getElementById('trending-repos').innerHTML = `
+                    <div class="col-12">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> No repositories found
+                        </div>
+                    </div>`;
+                return;
+            }
+
             document.getElementById('trending-repos').innerHTML = repos.map(repo => `
                 <div class="col-md-6 mb-4">
                     <div class="card h-100 border-primary">
@@ -37,10 +53,18 @@ document.addEventListener('DOMContentLoaded', function() {
                             <p class="card-text">${repo.description || 'No description available'}</p>
                             ${repo.language ? `<span class="badge bg-secondary">${repo.language}</span>` : ''}
                         </div>
-                        <div class="card-footer">
+                        <div class="card-footer d-flex justify-content-between">
                             <a href="${repo.url}" class="btn btn-outline-primary btn-sm" target="_blank">
                                 <i class="fas fa-external-link-alt"></i> View Repository
                             </a>
+                            <button onclick="saveResource({
+                                url: '${repo.url}',
+                                title: '${repo.name.replace(/'/g, "\\'")}',
+                                description: '${(repo.description || '').replace(/'/g, "\\'")}',
+                                source: 'GitHub'
+                            })" class="btn btn-outline-success btn-sm">
+                                <i class="fas fa-bookmark"></i> Save
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -51,7 +75,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('trending-repos').innerHTML = `
                 <div class="col-12">
                     <div class="alert alert-danger">
-                        <i class="fas fa-exclamation-circle"></i> Error loading repositories
+                        <i class="fas fa-exclamation-circle"></i> Error loading repositories: ${error.message}
                     </div>
                 </div>
             `;

@@ -1,11 +1,12 @@
 from django.urls import path
 from . import views
+from . import api
 
 app_name = 'resources'
 
 urlpatterns = [
     # API endpoints
-    path('api/github/trending/', views.trending_repos, name='trending_repos'),
+    path('api/github/trending/', api.get_trending_repos, name='github_trending'),
     path('save/', views.save_resource, name='save_resource'),
     
     # Views

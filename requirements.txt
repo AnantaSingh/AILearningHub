@@ -15,6 +15,7 @@ cryptography==44.0.1
 defusedxml==0.7.1
 Deprecated==1.2.18
 distro==1.9.0
+dj-database-url==2.3.0
 Django==4.2.10
 django-allauth==0.57.0
 django-crispy-forms==2.0
@@ -85,4 +86,3 @@ urllib3==1.26.20
 whitenoise==6.5.0
 wrapt==1.17.2
 zipp==3.21.0
-dj-database-url==2.1.0
