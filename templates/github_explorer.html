@@ -53,18 +53,10 @@ document.addEventListener('DOMContentLoaded', function() {
                             <p class="card-text">${repo.description || 'No description available'}</p>
                             ${repo.language ? `<span class="badge bg-secondary">${repo.language}</span>` : ''}
                         </div>
-                        <div class="card-footer d-flex justify-content-between">
+                        <div class="card-footer">
                             <a href="${repo.url}" class="btn btn-outline-primary btn-sm" target="_blank">
                                 <i class="fas fa-external-link-alt"></i> View Repository
                             </a>
-                            <button onclick="saveResource({
-                                url: '${repo.url}',
-                                title: '${repo.name.replace(/'/g, "\\'")}',
-                                description: '${(repo.description || '').replace(/'/g, "\\'")}',
-                                source: 'GitHub'
-                            })" class="btn btn-outline-success btn-sm">
-                                <i class="fas fa-bookmark"></i> Save
-                            </button>
                         </div>
                     </div>
                 </div>
